@@ -32,7 +32,7 @@ function Sidebar({activePage,setActivePage}){
       <div className="brand">
         <div className="icon"><Headset size={30} color="white"/></div>
 
-        <div>
+        <div className="brand-text">
           <h2>Suppor Flow</h2>
           <h3>CRM</h3>
         </div>
