@@ -14,7 +14,7 @@ A full-stack Customer Support CRM built using React.js and Python FastAPI Django
 - Customer Management
 - Conversations & Live Chat
 - Agent Management
-- Knowledge Base
+- knowledge Base
 - Reports & Analytics
 - Settings & Administration
 - User Login
