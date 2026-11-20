@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+<<<<<<< HEAD
     
     'analyse',
 ]
@@ -44,6 +45,17 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
 
     
+=======
+    'rest_framework',
+    'corsheaders',
+    'analyse',
+    'knowledage',
+    'administration'
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+>>>>>>> 3bd5a2583337a101d8b7bab78d28e9986b12eabe
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -78,8 +90,15 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'customer_support_crm',
+        'USER': 'root',
+        'PASSWORD': 'root123',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        },
     }
 }
 
