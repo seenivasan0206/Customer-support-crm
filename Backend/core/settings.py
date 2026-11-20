@@ -49,7 +49,7 @@ MIDDLEWARE = [
     'rest_framework',
     'corsheaders',
     'analyse',
-    'knowledage',
+    'knowledge',
     'administration'
 ]
 
