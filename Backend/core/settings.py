@@ -37,25 +37,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-<<<<<<< HEAD
-    
     'analyse',
-]
-
-MIDDLEWARE = [
-
-    
-=======
     'rest_framework',
     'corsheaders',
-    'analyse',
     'knowledge',
     'administration'
 ]
-
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
->>>>>>> 3bd5a2583337a101d8b7bab78d28e9986b12eabe
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
