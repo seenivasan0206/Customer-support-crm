@@ -41,8 +41,14 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'knowledge',
-    'administration'
+    'administration',
+    'accounts',
+    'tickets',
+    'dashboard',
 ]
+
+AUTH_USER_MODEL = 'accounts.User'
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
