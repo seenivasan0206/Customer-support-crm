@@ -45,6 +45,9 @@ INSTALLED_APPS = [
     'accounts',
     'tickets',
     'dashboard',
+    'customers',
+    'agents',
+    'conversations',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
@@ -88,7 +91,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'customer_support_crm',
         'USER': 'root',
-        'PASSWORD': 'root123',
+        'PASSWORD': 'root',
         'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {
