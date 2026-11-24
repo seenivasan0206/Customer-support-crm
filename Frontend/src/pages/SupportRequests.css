@@ -1,0 +1,190 @@
+/* Sidebar and header oda same navy theme */
+.sr-page {
+  background-color: rgb(19, 35, 73);
+  color: #dce5f5;
+  padding: 30px;
+  /* page-content oda white padding ah mooda */
+  margin: -25px;
+  min-height: calc(100vh - 96px);
+}
+
+/* Header */
+.sr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.sr-header h2 {
+  color: white;
+}
+
+.sr-header p {
+  color: #b8c5dc;
+  margin-top: 4px;
+}
+
+.sr-add-btn {
+  padding: 10px 18px;
+  background-color: rgb(62, 82, 212);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.sr-add-btn:hover {
+  background-color: rgb(81, 69, 216);
+}
+
+/* New request form */
+.sr-form {
+  background-color: rgb(30, 49, 88);
+  border: 1px solid rgb(41, 62, 104);
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.sr-form label {
+  display: block;
+  font-weight: bold;
+  color: #dce5f5;
+  margin-bottom: 5px;
+}
+
+.sr-form input,
+.sr-form select,
+.sr-toolbar input,
+.sr-toolbar select {
+  padding: 10px;
+  border: 1px solid rgb(41, 62, 104);
+  border-radius: 8px;
+  background-color: rgb(40, 62, 105);
+  color: white;
+}
+
+.sr-form input::placeholder,
+.sr-toolbar input::placeholder {
+  color: #c0cce0;
+}
+
+.sr-form input:focus,
+.sr-toolbar input:focus {
+  outline: none;
+  border-color: rgb(62, 82, 212);
+}
+
+.sr-form option,
+.sr-toolbar option {
+  background-color: rgb(40, 62, 105);
+  color: white;
+}
+
+.sr-save-btn {
+  padding: 10px 18px;
+  background-color: #16a34a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.sr-save-btn:hover {
+  background-color: #15803d;
+}
+
+/* Search and filter */
+.sr-toolbar {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.sr-toolbar input {
+  flex: 1;
+}
+
+/* Table */
+.sr-table-box {
+  background-color: rgb(30, 49, 88);
+  border: 1px solid rgb(41, 62, 104);
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+.sr-table-box table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sr-table-box th {
+  background-color: rgb(40, 62, 105);
+  text-align: left;
+  padding: 12px;
+  color: #dce5f5;
+}
+
+.sr-table-box td {
+  padding: 12px;
+  border-bottom: 1px solid rgb(41, 62, 104);
+  color: #dce5f5;
+}
+
+.sr-table-box tbody tr:hover td {
+  background-color: rgb(40, 62, 105);
+}
+
+/* Status dropdown colors */
+.sr-status {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  cursor: pointer;
+}
+
+.sr-status.open {
+  background-color: #f59e0b;
+}
+
+.sr-status.pending {
+  background-color: #dc2626;
+}
+
+.sr-status.resolved {
+  background-color: #16a34a;
+}
+
+.sr-status option {
+  background-color: rgb(40, 62, 105);
+  color: white;
+}
+
+/* Delete button */
+.sr-delete {
+  padding: 6px 12px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.sr-delete:hover {
+  background-color: #dc2626;
+}
+
+.sr-empty {
+  text-align: center;
+  color: #b8c5dc;
+  padding: 20px;
+}
