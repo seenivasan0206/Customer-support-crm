@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import "./Settings.css";
 
-const API_URL = "http://localhost:5000/api/settings";
+const API_URL = "http://localhost:5000/api/settings";       // API
 
 const initialProfile = {
   name: "",
@@ -80,7 +80,7 @@ export default function Settings({ registerPageGuard }) {
         setLoading(true);
 
         const response = await fetch(
-          `${API_URL}/profile`,
+          `${API_URL}/profile`,                   // ----------------For profile
           {
             credentials: "include",
             signal: controller.signal,
@@ -129,10 +129,10 @@ export default function Settings({ registerPageGuard }) {
       try {
         const [rolesResponse, integrationsResponse] =
           await Promise.all([
-            fetch(`${API_URL}/roles`, {
+            fetch(`${API_URL}/roles`, {                         // ---------------------- FOR Roles
               credentials: "include",
             }),
-            fetch(`${API_URL}/integrations`, {
+            fetch(`${API_URL}/integrations`, {                 // ----------------------For integrations
               credentials: "include",
             }),
           ]);
@@ -193,7 +193,7 @@ export default function Settings({ registerPageGuard }) {
       setSaving(true);
       setMessage("");
 
-      const response = await fetch(`${API_URL}/profile`, {
+      const response = await fetch(`${API_URL}/profile`, {               // ----------------- Profile
         method: "PUT",
         credentials: "include",
         headers: {
@@ -248,7 +248,7 @@ export default function Settings({ registerPageGuard }) {
     formData.append("photo", file);
 
     try {
-      const response = await fetch(`${API_URL}/profile/photo`, {
+      const response = await fetch(`${API_URL}/profile/photo`, {             // --------------------uplode the profile photo
         method: "POST",
         credentials: "include",
         body: formData,
@@ -270,7 +270,7 @@ export default function Settings({ registerPageGuard }) {
   // Remove photo from backend
   async function removePhoto() {
     try {
-      const response = await fetch(
+      const response = await fetch(                      // ---------------- Delete Photo
         `${API_URL}/profile/photo`,
         {
           method: "DELETE",

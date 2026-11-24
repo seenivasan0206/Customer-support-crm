@@ -30,10 +30,10 @@ import { createSampleRecords, buildSampleReport, sampleOptions, dateKey } from "
 
 // All reporting requests stay in this page. The backend supplies the aggregates.
 const apiBase = (
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api"
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api" /// API 
 ).replace(/\/$/, "");
 const reportsUrl = (
-  import.meta.env.VITE_REPORTS_API_URL || `${apiBase}/reports`
+  import.meta.env.VITE_REPORTS_API_URL || `${apiBase}/reports` //  ---------------------- For reports
 ).replace(/\/$/, ""); ////////////
 const initialFilters = {
   range: "30d",
