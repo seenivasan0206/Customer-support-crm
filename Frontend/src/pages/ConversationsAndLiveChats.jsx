@@ -1,76 +1,150 @@
-import React, {useState} from "react";
+import React, { useState } from 'react';
 
-function ConversationsAndLiveChats(){
+function ConversationsAndLiveChats() {
 
-  var [selectedConversation,setSelectedConversation]=useState('');
-  var [message,setMessage]=useState('');
-  var [chatMessages, setChatMessages]= useState({});
+  var [search, setSearch] = useState('');
+  var [selectedConversation, setSelectedConversation] = useState('');
+  var [message, setMessage] = useState('');
+  var [chatMessages, setChatMessages] = useState({});
 
-  function sendMessage(){
-    if(message.trim() !=='' && selectedConversation !==''){
-      setChatMessages({...chatMessages,[selectedConversation]:[...(chatMessages[selectedConversation] || []), message
-      ]});
+  var [conversations, setConversations] = useState([
+    {
+      name: 'Muvendhan',
+      lastMessage: 'I need help with my order',
+      status: 'Open',
+      agent: 'Support Agent',
+      time: '10:30 AM'
+    },
+    {
+      name: 'Shiva',
+      lastMessage: 'Where is my order?',
+      status: 'Pending',
+      agent: 'Support Agent',
+      time: '10:45 AM'
+    }
+  ]);
+
+  var filteredConversations = conversations.filter((conversation) => {
+    return conversation.name.toLowerCase().includes(search.toLowerCase());
+  });
+
+  function sendMessage() {
+
+    if (message.trim() !== '' && selectedConversation !== '') {
+
+      setChatMessages({
+        ...chatMessages,
+        [selectedConversation]: [
+          ...(chatMessages[selectedConversation] || []),
+          message
+        ]
+      });
+
       setMessage('');
     }
   }
-  return(
-    <div className="convo-page">
-      <h1>Conversations & Live Chats</h1>
-      <div className="conversations-container">
-        <h2>All Conversations</h2>
 
-        <input type="text" placeholder="search" />
+  function clearMessages() {
+
+    setChatMessages({
+      ...chatMessages,
+      [selectedConversation]: []
+    });
+  }
+
+  return (
+    <div className="conversations-page">
+
+      <h1>Conversations & Live Chats</h1>
+
+      <div className="conversations-container">
 
         <div className="conversation-list">
-          <div className="conversation">
-            <h3>Muvendhan</h3>
-            <p>I need help</p>
-            <p>Status: Open</p>
-             <p>Assigned to: Support Agent</p>
-             <p>10: 30 am</p>
-             <p>Messages: 3</p>
-             <button onClick={()=> setSelectedConversation('Muvendhan')}>view</button>
-          </div>
 
-          <div className="conversation">
-            <h3>Shiva</h3>
-            <p>Where is my order</p>
-            <p>Status: Pending</p>
-            <p>Assigned to: Support Agent</p>
-            <p>9:30 am</p>
-            <p>Messages: 2</p>
-            <button onClick={()=> setSelectedConversation('Shiva')}>view</button>
-          </div>
+          <h2>All Conversations</h2>
+
+          <input
+            type="text"
+            placeholder="Search conversations..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+
+          {filteredConversations.map((conversation, index) => {
+
+            return (
+              <div className="conversation" key={index}>
+
+                <h3>{conversation.name}</h3>
+
+                <p>{conversation.lastMessage}</p>
+
+                <p>Status: {conversation.status}</p>
+
+                <p>Assigned to: {conversation.agent}</p>
+
+                <p>{conversation.time}</p>
+
+                <button
+                  onClick={() => setSelectedConversation(conversation.name)}
+                >
+                  View Conversation
+                </button>
+
+              </div>
+            );
+          })}
+
         </div>
-        {selectedConversation !=='' &&(
-          <div>
+
+        {selectedConversation !== '' && (
+
+          <div className="chat-container">
+
             <h2>Chat with {selectedConversation}</h2>
 
             <div className="chat-messages">
-              <p>Customer: i need help</p>
-              <p>Agent: sure</p>
-              <p>Customer: where is my order?</p>
-              <p>Agent: let me check</p>
-              {(chatMessages[selectedConversation] || []).map((chat,index)=>{
-                  return(
-                    <p key={index}>Agent: chat</p>
-                  );
-                })}
-              }
+
+              <p>Customer: Hello, I need help.</p>
+
+              <p>Agent: Sure, I'd be happy to help.</p>
+
+              {(chatMessages[selectedConversation] || []).map((chat, index) => {
+
+                return (
+                  <p key={index}>Agent: {chat}</p>
+                );
+
+              })}
+
             </div>
 
-            <button onClick={()=> setChatMessages([])}>Clear message</button>
+            <button onClick={clearMessages}>
+              Clear Messages
+            </button>
 
             <div className="chat-input">
-              <input type="text" placeholder="type your message" value={message} onChange={(event)=> setMessage(event.target.value)}/>
-              <button onClick={sendMessage}>send</button>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
 
-  
+              <input
+                type="text"
+                placeholder="Type your message..."
+                value={message}
+                onChange={(event) => setMessage(event.target.value)}
+              />
+
+              <button onClick={sendMessage}>
+                Send
+              </button>
+
+            </div>
+
+          </div>
+
+        )}
+
+      </div>
+
+    </div>
   );
 }
 
