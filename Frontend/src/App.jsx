@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
+
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import KnowledgeBase from "./pages/KnowledgeBase";
@@ -9,28 +11,41 @@ import Settings from "./pages/Settings";
 import Customers from "./pages/CustomersManagement";
 import Agents from "./pages/Agents";
 import ConversationsAndLiveChats from "./pages/ConversationsAndLiveChats";
+
 import "./App.css";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activePage, setActivePage] = useState("dashboard");
 
+  // Show Login page if user is not logged in
   if (!isLoggedIn) {
     return <Login onLogin={() => setIsLoggedIn(true)} />;
   }
 
-  // sidebar la click panna activePage maarum, andha peru paarthu page kaattum
-  const page = String(activePage).toLowerCase();
-
+  // Render the selected page
   const renderPage = () => {
-    switch (activePage) {
+    switch (activePage.toLowerCase()) {
+      case "dashboard":
+        return <Dashboard />;
+
       case "knowledge":
         return <KnowledgeBase />;
 
       case "reports":
         return <Reports />;
+
       case "settings":
         return <Settings />;
+
+      case "agents":
+        return <Agents />;
+
+      case "customers":
+        return <Customers />;
+
+      case "conversations":
+        return <ConversationsAndLiveChats />;
 
       default:
         return <h2>Page Not Found</h2>;
@@ -39,32 +54,16 @@ function App() {
 
   return (
     <div className="app-layout">
-      <Sidebar activePage={activePage} setActivePage={setActivePage} />
+      <Sidebar
+        activePage={activePage}
+        setActivePage={setActivePage}
+      />
 
       <div className="main-section">
         <Header />
 
         <div className="page-content">
           {renderPage()}
-
-          <div className="page-content">
-            {page.includes("dashboard") && <Dashboard />}
-
-            {/* Dashboard thavira matha pages ku ippo page peru mattum kaattum */}
-            {!page.includes("dashboard") && <h2>{activePage}</h2>}
-          </div>
-
-          {activePage === "dashboard" ? (
-            <Dashboard />
-          ) : activePage === "customers" ? (
-            <Customers />
-          ) : activePage === "agents" ? (
-            <Agents />
-          ) : activePage === "conversations" ? (
-            <ConversationsAndLiveChats />
-          ) : (
-            <h2>{activePage}</h2>
-          )}
         </div>
       </div>
     </div>
