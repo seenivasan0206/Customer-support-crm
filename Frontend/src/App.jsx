@@ -6,13 +6,15 @@ import Dashboard from "./pages/Dashboard";
 import KnowledgeBase from "./pages/KnowledgeBase";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
+import Customers from "./pages/CustomersManagement";
+import Agents from "./pages/Agents";
+import ConversationsAndLiveChats from "./pages/ConversationsAndLiveChats";
 import "./App.css";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activePage, setActivePage] = useState("dashboard");
 
-  // login aagala na Login page mattum kaattum
   if (!isLoggedIn) {
     return <Login onLogin={() => setIsLoggedIn(true)} />;
   }
@@ -51,6 +53,18 @@ function App() {
             {/* Dashboard thavira matha pages ku ippo page peru mattum kaattum */}
             {!page.includes("dashboard") && <h2>{activePage}</h2>}
           </div>
+
+          {activePage === "dashboard" ? (
+            <Dashboard />
+          ) : activePage === "customers" ? (
+            <Customers />
+          ) : activePage === "agents" ? (
+            <Agents />
+          ) : activePage === "conversations" ? (
+            <ConversationsAndLiveChats />
+          ) : (
+            <h2>{activePage}</h2>
+          )}
         </div>
       </div>
     </div>
