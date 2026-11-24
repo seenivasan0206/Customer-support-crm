@@ -633,14 +633,14 @@ function ReportsContent({ sample, onSourceChange }) {
   const kpis = report?.kpis || {};
   const cards = [
     {
-      title: "Total tickets",
+      title: "Total querys",
       value: number(kpis.total_tickets),
       detail: change(kpis.ticket_change_percent),
       icon: Ticket,
       color: "blue",
     },
     {
-      title: "Resolved tickets",
+      title: "Resolved querys",
       value: number(kpis.resolved_tickets),
       detail: `${percent(kpis.resolved_percent)} resolved`,
       icon: CheckCircle2,
