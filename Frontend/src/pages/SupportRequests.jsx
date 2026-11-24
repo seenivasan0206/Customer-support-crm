@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./SupportRequests.css";
 
 function SupportRequests() {
-  // dummy data, backend ready ana apram API la irundhu varum
+ 
   const [tickets, setTickets] = useState([
     {
       id: 1001,
@@ -45,12 +45,12 @@ function SupportRequests() {
   const [statusFilter, setStatusFilter] = useState("All");
   const [showForm, setShowForm] = useState(false);
 
-  // form fields
+  
   const [customer, setCustomer] = useState("");
   const [subject, setSubject] = useState("");
   const [priority, setPriority] = useState("Medium");
 
-  // pudhu ticket add panna
+  
   function handleAdd(e) {
     e.preventDefault();
 
@@ -67,14 +67,14 @@ function SupportRequests() {
 
     setTickets([...tickets, newTicket]);
 
-    // form clear pannunga
+    
     setCustomer("");
     setSubject("");
     setPriority("Medium");
     setShowForm(false);
   }
 
-  // ticket delete panna
+  
   function handleDelete(id) {
     if (window.confirm("Are you sure you want to delete this ticket?")) {
       const updated = tickets.filter((t) => t.id !== id);
@@ -82,7 +82,7 @@ function SupportRequests() {
     }
   }
 
-  // status maathura
+  
   function handleStatusChange(id, newStatus) {
     const updated = tickets.map((t) => {
       if (t.id === id) {
@@ -93,7 +93,7 @@ function SupportRequests() {
     setTickets(updated);
   }
 
-  // search and filter apply panna
+  
   const filteredTickets = tickets.filter((t) => {
     const matchSearch =
       t.customer.toLowerCase().includes(search.toLowerCase()) ||
@@ -104,7 +104,7 @@ function SupportRequests() {
 
   return (
     <div className="sr-page">
-      {/* Header */}
+      
       <div className="sr-header">
         <div>
           <h2>Support Requests</h2>
@@ -115,7 +115,7 @@ function SupportRequests() {
         </button>
       </div>
 
-      {/* New request form */}
+      
       {showForm && (
         <form className="sr-form" onSubmit={handleAdd}>
           <div>
@@ -158,7 +158,7 @@ function SupportRequests() {
         </form>
       )}
 
-      {/* Search and filter */}
+      
       <div className="sr-toolbar">
         <input
           type="text"
@@ -178,7 +178,7 @@ function SupportRequests() {
         </select>
       </div>
 
-      {/* Tickets table */}
+      
       <div className="sr-table-box">
         <table>
           <thead>

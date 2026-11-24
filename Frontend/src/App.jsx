@@ -1,34 +1,105 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import SupportRequests from "./pages/SupportRequests";
 import "./App.css";
 
-function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [activePage, setActivePage] = useState("dashboard");
 
-  // login aagala na Login page mattum kaattum
-  if (!isLoggedIn) {
-    return <Login onLogin={() => setIsLoggedIn(true)} />;
+function isSavedLogin() {
+  return sessionStorage.getItem("isLoggedIn") === "true";
+}
+
+
+function getPageFromUrl() {
+  return decodeURIComponent(window.location.hash.replace("#/", ""));
+}
+
+function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(isSavedLogin());
+
+  const [activePage, setActivePage] = useState(() => {
+    let page = getPageFromUrl();
+
+    
+    if (page === "") {
+      page = isSavedLogin() ? "dashboard" : "login";
+      window.history.replaceState(null, "", "#/" + page);
+    }
+    return page;
+  });
+
+  
+  useEffect(() => {
+    function handleUrlChange() {
+      setActivePage(getPageFromUrl());
+    }
+
+    window.addEventListener("hashchange", handleUrlChange);
+    return () => window.removeEventListener("hashchange", handleUrlChange);
+  }, []);
+
+  
+  useEffect(() => {
+    if (activePage === "login" && isLoggedIn) {
+      sessionStorage.removeItem("isLoggedIn");
+      setIsLoggedIn(false);
+    }
+
+    if (!isLoggedIn && activePage !== "login") {
+      window.history.replaceState(null, "", "#/login");
+      setActivePage("login");
+    }
+  }, [activePage, isLoggedIn]);
+
+  
+  function changePage(page) {
+    window.location.hash = "/" + encodeURIComponent(page);
   }
 
-  // sidebar la click panna activePage maarum, andha peru paarthu page kaattum
-  const page = String(activePage).toLowerCase();
+  
+  function handleLogin() {
+    sessionStorage.setItem("isLoggedIn", "true");
+    setActivePage("dashboard");
+    setIsLoggedIn(true);
+    window.location.hash = "/dashboard";
+  }
+
+  
+  function handleLogout() {
+    sessionStorage.removeItem("isLoggedIn");
+    setIsLoggedIn(false);
+    setActivePage("login");
+    window.location.hash = "/login";
+  }
+
+  
+  if (!isLoggedIn || activePage === "login") {
+    return <Login onLogin={handleLogin} />;
+  }
+
+  const page = activePage === "" ? "dashboard" : activePage;
+  const pageLower = page.toLowerCase();
 
   return (
     <div className="app-layout">
-      <Sidebar activePage={activePage} setActivePage={setActivePage} />
+      <Sidebar
+        activePage={page}
+        setActivePage={changePage}
+        onLogout={handleLogout}
+      />
 
       <div className="main-section">
-        <Header />
+        <Header onLogout={handleLogout} />
 
         <div className="page-content">
-          {page.includes("dashboard") && <Dashboard />}
+          {pageLower.includes("dashboard") && <Dashboard />}
+          {pageLower.includes("support") && <SupportRequests />}
 
-          {/* Dashboard thavira matha pages ku ippo page peru mattum kaattum */}
-          {!page.includes("dashboard") && <h2>{activePage}</h2>}
+          {}
+          {!pageLower.includes("dashboard") &&
+            !pageLower.includes("support") && <h2>{page}</h2>}
         </div>
       </div>
     </div>

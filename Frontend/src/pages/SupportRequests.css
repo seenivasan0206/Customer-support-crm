@@ -1,14 +1,12 @@
-/* Sidebar and header oda same navy theme */
 .sr-page {
   background-color: rgb(19, 35, 73);
   color: #dce5f5;
   padding: 30px;
-  /* page-content oda white padding ah mooda */
+
   margin: -25px;
   min-height: calc(100vh - 96px);
 }
 
-/* Header */
 .sr-header {
   display: flex;
   justify-content: space-between;
@@ -39,7 +37,6 @@
   background-color: rgb(81, 69, 216);
 }
 
-/* New request form */
 .sr-form {
   background-color: rgb(30, 49, 88);
   border: 1px solid rgb(41, 62, 104);
@@ -100,7 +97,6 @@
   background-color: #15803d;
 }
 
-/* Search and filter */
 .sr-toolbar {
   display: flex;
   gap: 15px;
@@ -111,7 +107,6 @@
   flex: 1;
 }
 
-/* Table */
 .sr-table-box {
   background-color: rgb(30, 49, 88);
   border: 1px solid rgb(41, 62, 104);
@@ -143,7 +138,6 @@
   background-color: rgb(40, 62, 105);
 }
 
-/* Status dropdown colors */
 .sr-status {
   padding: 4px 8px;
   border: none;
@@ -169,7 +163,6 @@
   color: white;
 }
 
-/* Delete button */
 .sr-delete {
   padding: 6px 12px;
   background-color: #ef4444;
