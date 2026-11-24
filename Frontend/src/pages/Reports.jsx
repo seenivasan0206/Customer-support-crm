@@ -57,7 +57,7 @@ const charts = [
   {
     key: "query_volume",
     title: "query over time",
-    // subtitle: "Incoming ticket volume",
+    // subtitle: "Incoming query volume",
     subtitle: "Incoming query volume",
     type: "line",
     fields: [["tickets", "Tickets"]],
