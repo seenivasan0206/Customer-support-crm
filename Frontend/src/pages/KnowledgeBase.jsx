@@ -10,6 +10,12 @@ const articlesUrl = `${apiBase}/knowledge/articles/`;
 const categoriesUrl = `${apiBase}/knowledge/categories/`;
 
 async function request(url, options = {}) {
+  const token = localStorage.getItem("access_token");
+  const headers = {
+    ...(options.headers || {}),
+    ...(token ? { "Authorization": `Bearer ${token}` } : {})
+  };
+  options = { ...options, headers };
   let response;
   try {
     response = await fetch(url, options);

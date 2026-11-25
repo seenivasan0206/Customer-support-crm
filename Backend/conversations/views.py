@@ -17,7 +17,19 @@ def paginated(request, qs, serializer_class=ConversationSerializer):
 @api_view(["GET", "POST"])
 def conversation_list_create(request):
     if request.method == "POST":
-        serializer = ConversationSerializer(data=request.data)
+        data = request.data.copy() if hasattr(request.data, "copy") else dict(request.data)
+        if not data.get("customer"):
+            from customers.models import Customer
+            first_cust = Customer.objects.first()
+            if not first_cust:
+                first_cust = Customer.objects.create(
+                    full_name=data.get("customer_name") or "Support Customer",
+                    email=f"customer{Customer.objects.count() + 1}@example.com",
+                    subscription_plan="FREE",
+                    account_status="ACTIVE"
+                )
+            data["customer"] = first_cust.customer_id
+        serializer = ConversationSerializer(data=data)
         if serializer.is_valid():
             conversation = serializer.save()
             return Response(ConversationSerializer(conversation).data, status=201)
