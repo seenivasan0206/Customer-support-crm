@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import React, { useState } from "react";
-=======
 import React, { useState, useEffect } from "react";
->>>>>>> c831d98fc837eff214248bda2845a8079fbb5ffe
 import {
   BarChart,
   Bar,
@@ -159,52 +155,6 @@ function getDate(daysAgo) {
 }
 
 function Dashboard() {
-<<<<<<< HEAD
-  const [rangeDays, setRangeDays] = useState(30);
-  const [status, setStatus] = useState("All");
-  const [priority, setPriority] = useState("All");
-
-  const filteredTickets = allTickets.filter((t) => {
-    const matchRange = t.daysAgo < rangeDays;
-    const matchStatus = status === "All" || t.status === status;
-    const matchPriority = priority === "All" || t.priority === priority;
-    return matchRange && matchStatus && matchPriority;
-  });
-
-  const stats = [
-    { title: "Total Tickets", count: filteredTickets.length, color: "#4f46e5" },
-    {
-      title: "Open",
-      count: filteredTickets.filter((t) => t.status === "Open").length,
-      color: "#f59e0b",
-    },
-    {
-      title: "Resolved",
-      count: filteredTickets.filter((t) => t.status === "Resolved").length,
-      color: "#16a34a",
-    },
-    {
-      title: "Pending",
-      count: filteredTickets.filter((t) => t.status === "Pending").length,
-      color: "#dc2626",
-    },
-  ];
-
-  const chartData = weekDays.map((day) => ({ day: day, tickets: 0 }));
-  filteredTickets.forEach((t) => {
-    const jsDay = getDate(t.daysAgo).getDay(); // 0 = Sunday
-    const index = jsDay === 0 ? 6 : jsDay - 1;
-    chartData[index].tickets += 1;
-  });
-
-  const shownTickets = filteredTickets.slice(0, 6);
-
-  function resetFilters() {
-    setRangeDays(30);
-    setStatus("All");
-    setPriority("All");
-  }
-=======
   // State for dashboard metrics and live tickets
   const [summary, setSummary] = useState({
     total_tickets: 0,
@@ -265,7 +215,6 @@ function Dashboard() {
     { day: "Sat", tickets: 2 },
     { day: "Sun", tickets: summary.total_tickets },
   ];
->>>>>>> c831d98fc837eff214248bda2845a8079fbb5ffe
 
   return (
     <div className="dashboard-page">
@@ -274,54 +223,7 @@ function Dashboard() {
         Welcome back! Here is your support summary.
       </p>
 
-<<<<<<< HEAD
-      <div className="dash-filters">
-        <div className="dash-range">
-          {ranges.map((r) => (
-            <button
-              key={r.label}
-              className={rangeDays === r.days ? "active" : ""}
-              onClick={() => setRangeDays(r.days)}
-            >
-              {r.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="dash-selects">
-          <label>
-            Status
-            <select value={status} onChange={(e) => setStatus(e.target.value)}>
-              <option>All</option>
-              <option>Open</option>
-              <option>Pending</option>
-              <option>Resolved</option>
-            </select>
-          </label>
-
-          <label>
-            Priority
-            <select
-              value={priority}
-              onChange={(e) => setPriority(e.target.value)}
-            >
-              <option>All</option>
-              <option>High</option>
-              <option>Medium</option>
-              <option>Low</option>
-            </select>
-          </label>
-
-          <button className="dash-reset" onClick={resetFilters}>
-            Reset
-          </button>
-        </div>
-      </div>
-
-      {/* Stats cards */}
-=======
       {/* Top Statistic Cards */}
->>>>>>> c831d98fc837eff214248bda2845a8079fbb5ffe
       <div className="stats-container">
         {stats.map((item) => (
           <div
@@ -337,11 +239,7 @@ function Dashboard() {
 
       {/* Weekly Chart */}
       <div className="dash-box">
-<<<<<<< HEAD
-        <h3>Tickets by Day</h3>
-=======
         <h3>Tickets Summary Chart</h3>
->>>>>>> c831d98fc837eff214248bda2845a8079fbb5ffe
         <ResponsiveContainer width="100%" height={250}>
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgb(41, 62, 104)" />
@@ -363,15 +261,7 @@ function Dashboard() {
 
       {/* Recent Support Requests Table */}
       <div className="dash-box">
-<<<<<<< HEAD
-        <h3>Recent Tickets</h3>
-        <p className="dash-count">
-          Showing {shownTickets.length} of {filteredTickets.length} tickets
-        </p>
-
-=======
         <h3>Recent Support Tickets</h3>
->>>>>>> c831d98fc837eff214248bda2845a8079fbb5ffe
         <table>
           <thead>
             <tr>
@@ -384,28 +274,10 @@ function Dashboard() {
             </tr>
           </thead>
           <tbody>
-<<<<<<< HEAD
-            {shownTickets.map((ticket) => (
-              <tr key={ticket.id}>
-                <td>{ticket.id}</td>
-                <td>{ticket.customer}</td>
-                <td>{ticket.subject}</td>
-                <td>
-                  {getDate(ticket.daysAgo).toLocaleDateString("en-IN", {
-                    day: "2-digit",
-                    month: "short",
-                  })}
-                </td>
-                <td>
-                  <span className={"dash-badge " + ticket.status.toLowerCase()}>
-                    {ticket.status}
-                  </span>
-=======
             {recentTickets.length === 0 ? (
               <tr>
                 <td colSpan="5" style={{ textAlign: "center", padding: "16px" }}>
                   {loading ? "Loading tickets..." : "No support tickets found in database."}
->>>>>>> c831d98fc837eff214248bda2845a8079fbb5ffe
                 </td>
               </tr>
             ) : (
