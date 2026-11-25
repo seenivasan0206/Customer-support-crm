@@ -16,6 +16,87 @@
   color: #b8c5dc;
 }
 
+.dash-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 25px;
+  background-color: rgb(30, 49, 88);
+  border: 1px solid rgb(41, 62, 104);
+  padding: 14px 18px;
+  border-radius: 10px;
+}
+
+.dash-range {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dash-range button {
+  padding: 8px 16px;
+  border: 1px solid rgb(41, 62, 104);
+  border-radius: 20px;
+  background-color: rgb(40, 62, 105);
+  color: #dce5f5;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.dash-range button:hover {
+  border-color: rgb(62, 82, 212);
+}
+
+.dash-range button.active {
+  background-color: rgb(62, 82, 212);
+  border-color: rgb(62, 82, 212);
+  color: white;
+}
+
+.dash-selects {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.dash-selects label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #b8c5dc;
+  font-size: 14px;
+}
+
+.dash-selects select {
+  padding: 8px 12px;
+  border: 1px solid rgb(41, 62, 104);
+  border-radius: 8px;
+  background-color: rgb(40, 62, 105);
+  color: white;
+}
+
+.dash-selects select option {
+  background-color: rgb(40, 62, 105);
+  color: white;
+}
+
+.dash-reset {
+  padding: 8px 16px;
+  background-color: transparent;
+  border: 1px solid rgb(62, 82, 212);
+  color: #8fa2ff;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.dash-reset:hover {
+  background-color: rgb(62, 82, 212);
+  color: white;
+}
+
 .stats-container {
   display: flex;
   gap: 20px;
@@ -56,6 +137,13 @@
   color: white;
 }
 
+.dash-count {
+  color: #b8c5dc;
+  font-size: 14px;
+  margin-top: -8px;
+  margin-bottom: 14px;
+}
+
 .dash-box table {
   width: 100%;
   border-collapse: collapse;
@@ -76,6 +164,12 @@
 
 .dash-box tr:hover td {
   background-color: rgb(40, 62, 105);
+}
+
+.dash-empty {
+  text-align: center;
+  color: #b8c5dc;
+  padding: 20px;
 }
 
 .dash-badge {
