@@ -1,9 +1,8 @@
-/* Sidebar and header oda same navy theme */
 .dashboard-page {
   background-color: rgb(19, 35, 73);
   color: #dce5f5;
   padding: 30px;
-  /* page-content oda white padding ah mooda */
+
   margin: -25px;
   min-height: calc(100vh - 96px);
 }
@@ -17,7 +16,6 @@
   color: #b8c5dc;
 }
 
-/* Stats cards */
 .stats-container {
   display: flex;
   gap: 20px;
@@ -45,7 +43,6 @@
   color: white;
 }
 
-/* Chart and table boxes */
 .dash-box {
   background-color: rgb(30, 49, 88);
   padding: 20px;
@@ -81,7 +78,6 @@
   background-color: rgb(40, 62, 105);
 }
 
-/* Status badges */
 .dash-badge {
   padding: 4px 10px;
   border-radius: 12px;

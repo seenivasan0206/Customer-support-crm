@@ -11,7 +11,6 @@ import {
 import "./Dashboard.css";
 
 function Dashboard() {
-  // dummy data, backend ready ana apram API la irundhu varum
   const stats = [
     { title: "Total Tickets", count: 120, color: "#4f46e5" },
     { title: "Open", count: 45, color: "#f59e0b" },
@@ -74,7 +73,6 @@ function Dashboard() {
         Welcome back! Here is your support summary.
       </p>
 
-      {/* Stats cards */}
       <div className="stats-container">
         {stats.map((item) => (
           <div
@@ -88,7 +86,6 @@ function Dashboard() {
         ))}
       </div>
 
-      {/* Chart */}
       <div className="dash-box">
         <h3>Tickets This Week</h3>
         <ResponsiveContainer width="100%" height={250}>
@@ -110,7 +107,6 @@ function Dashboard() {
         </ResponsiveContainer>
       </div>
 
-      {/* Recent tickets table */}
       <div className="dash-box">
         <h3>Recent Tickets</h3>
         <table>
