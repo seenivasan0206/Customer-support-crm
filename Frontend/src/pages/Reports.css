@@ -17,18 +17,19 @@
   justify-content: center;
   gap: 7px;
   padding: 10px 13px;
-  border: 1px solid #d7e0e9;
+  border: 1px solid rgb(41, 62, 104);
   border-radius: 8px;
-  background: #fff;
-  color: #334b63;
+  background: rgb(40, 62, 105);
+  color: #fff;
   font: inherit;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
 }
 .reports-page button:hover:not(:disabled) {
-  background: #eef4fb;
-  border-color: #a8bfd8;
+  background: rgb(62, 82, 212);
+  border-color: rgb(62, 82, 212);
+  color: #fff;
 }
 .reports-page button:disabled {
   opacity: 0.45;
@@ -108,17 +109,21 @@
 .reports-page :is(input, select) {
   width: 100%;
   min-width: 0;
-  background: #fff;
-  border: 1px solid #d7e0e9;
+  background-color: rgb(40, 62, 105);
+  border: 1px solid rgb(41, 62, 104);
   border-radius: 7px;
   padding: 10px;
   min-height: 39px;
-  color: #253c54;
+  color: #fff;
   font: inherit;
   font-size: 12px;
 }
+.reports-page select option {
+  background-color: rgb(40, 62, 105);
+  color: #fff;
+}
 .reports-page select:disabled {
-  background: #f6f8fa;
+  background: rgb(30, 49, 88);
   color: #6b7e90;
 }
 .report-filter-footer {
@@ -139,12 +144,12 @@
   color: #98651d;
 }
 .reports-page button.report-primary {
-  background: #255c9f;
+  background: rgb(62, 82, 212);
   color: #fff;
-  border-color: #255c9f;
+  border-color: rgb(62, 82, 212);
 }
 .reports-page button.report-primary:hover:not(:disabled) {
-  background: #17477f;
+  background: rgb(48, 67, 185);
 }
 .report-custom-dates {
   display: flex;

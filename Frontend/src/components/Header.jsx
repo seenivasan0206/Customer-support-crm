@@ -1,10 +1,9 @@
 import React from 'react';
 import {
-  Bell, CircleHelp, ChevronDown
-}
-from 'lucide-react';
+  CircleHelp, LogOut
+} from 'lucide-react';
 
-function Header() {
+function Header({ onLogout, onProfileClick, onHelpClick }) {
   const username = localStorage.getItem("username") || "User";
   const userRole = localStorage.getItem("user_role") || "CUSTOMER";
   const initial = username.charAt(0).toUpperCase();
@@ -19,13 +18,32 @@ function Header() {
       </div>
 
       <div className="header-right">
-        <Bell size={22}/>
-        <CircleHelp size={22}/>
-        <div className="profile" title={`${username} (${userRole})`}>
-          {initial} <span className='online-dot'/>
+        <button
+          type="button"
+          className="header-icon-btn"
+          onClick={onHelpClick}
+          title="Help & Support"
+        >
+          <CircleHelp size={22} />
+        </button>
+        <div
+          className="profile"
+          title={`${username} (${userRole}) - Settings & Administration`}
+          onClick={onProfileClick}
+          style={{ cursor: 'pointer' }}
+        >
+          {initial} <span className="online-dot" />
         </div>
+        <button
+          className="header-logout-btn"
+          onClick={onLogout}
+          title="Logout"
+          type="button"
+        >
+          <LogOut size={18} />
+          <span>Logout</span>
+        </button>
       </div>
-      <ChevronDown size={16}/>
     </header>
   );
 }

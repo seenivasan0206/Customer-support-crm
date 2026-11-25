@@ -1,39 +1,39 @@
 .settings-page {
   max-width: 960px;
-  padding: 8px;
-  color: #132349;
+  padding: 30px;
+  color: white;
+  min-height: 100vh;
+  background-color: rgb(19, 35, 73);
 }
+
 .settings-page .settings-heading {
   margin-bottom: 24px;
-  color: #bec0f1;
+  color: white;
 }
+
 .settings-page .settings-heading h2 {
-  font-size: 30px;
-  margin-bottom: 10px;
+  font-size: 32px;
+  margin: 10px 0;
+  color: white;
 }
+
 .settings-page .settings-heading p {
-  color: #c0cce0;
+  color: #b8c5dc;
   font-size: 14px;
 }
+
 .settings-page .settings-profile {
-  --settings-bg: #fff;
-  --settings-ink: #202329;
-  --settings-muted: #737985;
-  --settings-line: #e5e7eb;
-  background: #132349;
+  --settings-bg: rgb(40, 62, 105);
+  --settings-ink: #ffffff;
+  --settings-muted: #b8c5dc;
+  --settings-line: rgb(41, 62, 104);
+  background: rgb(30, 49, 88);
   color: var(--settings-ink);
   padding: 32px 30px 22px;
   border: 1px solid var(--settings-line);
   border-radius: 10px;
-  border-color:#34445c ;
 }
-.settings-page .settings-profile[data-theme="dark"] {
-  --settings-bg: #1e293b;
-  --settings-ink: #f1f5f9;
-  --settings-muted: #bac5d5;
-  --settings-line: #40506a;
-  color-scheme: dark;
-}
+
 .settings-page .settings-photo-row {
   display: flex;
   align-items: center;
@@ -42,55 +42,71 @@
   padding-bottom: 24px;
   border-bottom: 1px solid var(--settings-line);
 }
+
 .settings-page .settings-avatar {
   width: 92px;
   height: 92px;
   border-radius: 50%;
   flex-shrink: 0;
   overflow: hidden;
-  background: #f8d7da;
-  color: #88424f;
+  background: rgb(81, 69, 216);
+  color: white;
   display: grid;
   place-items: center;
   font-size: 28px;
   font-weight: 600;
   letter-spacing: 1px;
 }
+
 .settings-page .settings-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
+
 .settings-page .settings-photo-actions {
   display: flex;
   gap: 8px;
 }
+
 .settings-page button,
 .settings-page select {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 7px;
-  padding: 6px 9px;
+  padding: 8px 14px;
   border: 1px solid var(--settings-line);
-  border-radius: 7px;
+  border-radius: 8px;
   background: var(--settings-bg);
-  color: var(--settings-ink);
+  color: white;
   font: inherit;
   font-size: 14px;
-  box-shadow: 0 1px 2px #00000008;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
+
 .settings-page button:hover:not(:disabled) {
-  border-color: #94a3b8;
+  background: rgb(62, 82, 212);
+  border-color: rgb(62, 82, 212);
 }
+
 .settings-page .settings-photo-remove {
-  color: #e23965;
+  color: #fca5a5;
+  border-color: rgba(220, 38, 38, 0.4);
 }
+
+.settings-page .settings-photo-remove:hover:not(:disabled) {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: white;
+}
+
 .settings-page button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
+
 .settings-page .settings-row {
   display: flex;
   align-items: flex-start;
@@ -99,47 +115,56 @@
   padding: 19px 0;
   border-bottom: 1px solid var(--settings-line);
 }
+
 .settings-page .settings-row-content {
   flex: 1;
   min-width: 0;
 }
+
 .settings-page .settings-row h3 {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   line-height: 1.5;
   margin: 0 0 4px;
-  color: rgb(202, 199, 248);
+  color: white;
 }
+
 .settings-page .settings-row p {
   color: var(--settings-muted);
   font-size: 14px;
   line-height: 1.55;
   overflow-wrap: anywhere;
-  color: rgb(188, 181, 242);
 }
+
 .settings-page .settings-row > button,
 .settings-page .settings-row > select {
   flex-shrink: 0;
 }
+
 .settings-page .settings-role-badge {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: #edf3ff;
-  color: #315bc0;
-  padding: 3px 9px;
-  border-radius: 5px;
+  background: rgba(62, 82, 212, 0.25);
+  border: 1px solid rgb(62, 82, 212);
+  color: #8fa2ff;
+  padding: 4px 10px;
+  border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
 }
+
 .settings-page .settings-role-caption {
   margin-left: 9px;
   font-size: 12px;
+  color: #b8c5dc;
 }
+
 .settings-page .settings-role-options {
   margin-top: 8px;
   font-size: 12px !important;
 }
+
 .settings-page .settings-readonly {
   display: inline-flex;
   align-items: center;
@@ -149,6 +174,7 @@
   padding: 6px 0;
   white-space: nowrap;
 }
+
 .settings-page .settings-connection {
   color: var(--settings-muted);
   border: 1px solid var(--settings-line);
@@ -157,16 +183,19 @@
   font-size: 12px;
   white-space: nowrap;
 }
+
 .settings-page form {
   max-width: 460px;
   margin-top: 12px;
 }
+
 .settings-page form label {
   display: block;
   margin: 12px 0;
   color: var(--settings-muted);
   font-size: 12px;
 }
+
 .settings-page form input,
 .settings-page form select {
   display: block;
@@ -174,47 +203,58 @@
   margin-top: 6px;
   padding: 10px;
   border: 1px solid var(--settings-line);
-  border-radius: 6px;
+  border-radius: 8px;
   font: inherit;
   font-size: 14px;
   color: var(--settings-ink);
   background: var(--settings-bg);
 }
+
 .settings-page .settings-actions {
   display: flex;
   gap: 8px;
   margin-top: 14px;
 }
+
 .settings-page button[type="submit"] {
-  background: #2563eb;
+  background: rgb(62, 82, 212);
   color: #fff;
-  border-color: #2563eb;
+  border-color: rgb(62, 82, 212);
 }
+
+.settings-page button[type="submit"]:hover {
+  background: rgb(81, 69, 216);
+  border-color: rgb(81, 69, 216);
+}
+
 .settings-page .settings-demo {
   margin-top: 20px;
-  color: var(--settings-muted);
   font-size: 11px;
   line-height: 1.6;
-  color: #99aee1;
+  color: #b8c5dc;
 }
+
 .settings-page .settings-demo strong {
-  color: var(--settings-ink);
+  color: white;
   font-weight: 600;
-  color: #e3e8f4;
 }
+
 .settings-page .settings-demo p {
   margin-top: 4px;
 }
+
 .settings-page .settings-message {
   margin-top: 14px;
-  color: var(--settings-ink);
+  color: white;
   font-size: 13px;
   line-height: 1.6;
 }
+
 .settings-page :is(input, button, select):focus-visible {
-  outline: 3px solid #93bafb;
+  outline: 3px solid rgb(62, 82, 212);
   outline-offset: 3px;
 }
+
 @media (max-width: 640px) {
   .settings-page .settings-profile {
     padding: 22px 16px;

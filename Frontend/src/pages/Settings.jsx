@@ -7,7 +7,11 @@ import {
 } from "lucide-react";
 import "./Settings.css";
 
-const API_URL = "http://localhost:5000/api/settings";       // API
+const API_URL =
+  import.meta.env.VITE_SETTINGS_API_URL ||
+  (import.meta.env.VITE_API_BASE_URL
+    ? `${import.meta.env.VITE_API_BASE_URL}/settings`
+    : "http://localhost:8000/api/settings");
 
 const initialProfile = {
   name: "",
@@ -80,7 +84,7 @@ export default function Settings({ registerPageGuard }) {
         setLoading(true);
 
         const response = await fetch(
-          `${API_URL}/profile`,                   // ----------------For profile
+          `${API_URL}/profile`,
           {
             credentials: "include",
             signal: controller.signal,
@@ -129,10 +133,10 @@ export default function Settings({ registerPageGuard }) {
       try {
         const [rolesResponse, integrationsResponse] =
           await Promise.all([
-            fetch(`${API_URL}/roles`, {                         // ---------------------- FOR Roles
+            fetch(`${API_URL}/roles`, {
               credentials: "include",
             }),
-            fetch(`${API_URL}/integrations`, {                 // ----------------------For integrations
+            fetch(`${API_URL}/integrations`, {
               credentials: "include",
             }),
           ]);
@@ -193,7 +197,7 @@ export default function Settings({ registerPageGuard }) {
       setSaving(true);
       setMessage("");
 
-      const response = await fetch(`${API_URL}/profile`, {               // ----------------- Profile
+      const response = await fetch(`${API_URL}/profile`, {
         method: "PUT",
         credentials: "include",
         headers: {
@@ -229,7 +233,6 @@ export default function Settings({ registerPageGuard }) {
     }
   }
 
-  // Upload photo to backend
   async function choosePhoto(event) {
     const file = event.target.files?.[0];
     event.target.value = "";
@@ -248,7 +251,7 @@ export default function Settings({ registerPageGuard }) {
     formData.append("photo", file);
 
     try {
-      const response = await fetch(`${API_URL}/profile/photo`, {             // --------------------uplode the profile photo
+      const response = await fetch(`${API_URL}/profile/photo`, {
         method: "POST",
         credentials: "include",
         body: formData,
@@ -267,10 +270,9 @@ export default function Settings({ registerPageGuard }) {
     }
   }
 
-  // Remove photo from backend
   async function removePhoto() {
     try {
-      const response = await fetch(                      // ---------------- Delete Photo
+      const response = await fetch(
         `${API_URL}/profile/photo`,
         {
           method: "DELETE",

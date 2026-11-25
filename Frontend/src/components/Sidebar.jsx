@@ -68,12 +68,15 @@ function Sidebar({ activePage, setActivePage }) {
         })}
       </nav>
 
-      <div className="help-link">
+      <button
+        type="button"
+        className={activePage === 'help' ? 'help-link active' : 'help-link'}
+        onClick={() => setActivePage('help')}
+      >
         <CircleHelp size={22} />
         <span>Help & Support</span>
-        <ExternalLink size={16}
-        className="help-external" />
-      </div>
+        <ExternalLink size={16} className="help-external" />
+      </button>
 
       <div className="workspace">
         <div className="workspace-icon">

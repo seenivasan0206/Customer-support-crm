@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import React, { useState } from "react";
-=======
 import React, { useState, useEffect } from "react";
->>>>>>> c831d98fc837eff214248bda2845a8079fbb5ffe
 import {
   BarChart,
   Bar,
@@ -159,20 +155,64 @@ function getDate(daysAgo) {
 }
 
 function Dashboard() {
-<<<<<<< HEAD
-  const [rangeDays, setRangeDays] = useState(30);
+  const [rangeDays, setRangeDays] = useState(9999);
   const [status, setStatus] = useState("All");
   const [priority, setPriority] = useState("All");
 
+  const [dbSummary, setDbSummary] = useState(null);
+  const [recentTickets, setRecentTickets] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchDashboardData() {
+      const token = localStorage.getItem("access_token");
+
+      try {
+        const response = await fetch("http://localhost:8000/api/dashboard/overview/", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setDbSummary(data.summary);
+          setRecentTickets(data.recent_requests || []);
+        } else {
+          console.error("Failed to load dashboard data:", data);
+        }
+      } catch (err) {
+        console.error("Network error while connecting to dashboard API:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchDashboardData();
+  }, []);
+
   const filteredTickets = allTickets.filter((t) => {
-    const matchRange = t.daysAgo < rangeDays;
-    const matchStatus = status === "All" || t.status === status;
-    const matchPriority = priority === "All" || t.priority === priority;
-    return matchRange && matchStatus && matchPriority;
+    if (t.daysAgo > rangeDays) return false;
+    if (status !== "All" && t.status.toLowerCase() !== status.toLowerCase()) return false;
+    if (priority !== "All" && t.priority.toLowerCase() !== priority.toLowerCase()) return false;
+    return true;
   });
 
+  const resetFilters = () => {
+    setRangeDays(9999);
+    setStatus("All");
+    setPriority("All");
+  };
+
   const stats = [
-    { title: "Total Tickets", count: filteredTickets.length, color: "#4f46e5" },
+    {
+      title: "Total Tickets",
+      count: filteredTickets.length,
+      color: "#4f46e5",
+    },
     {
       title: "Open",
       count: filteredTickets.filter((t) => t.status === "Open").length,
@@ -190,82 +230,11 @@ function Dashboard() {
     },
   ];
 
-  const chartData = weekDays.map((day) => ({ day: day, tickets: 0 }));
-  filteredTickets.forEach((t) => {
-    const jsDay = getDate(t.daysAgo).getDay(); // 0 = Sunday
-    const index = jsDay === 0 ? 6 : jsDay - 1;
-    chartData[index].tickets += 1;
+  const chartData = weekDays.map((day, idx) => {
+    const dayOffset = (new Date().getDay() - 1 - idx + 7) % 7;
+    const count = filteredTickets.filter((t) => t.daysAgo === dayOffset).length;
+    return { day, tickets: count };
   });
-
-  const shownTickets = filteredTickets.slice(0, 6);
-
-  function resetFilters() {
-    setRangeDays(30);
-    setStatus("All");
-    setPriority("All");
-  }
-=======
-  // State for dashboard metrics and live tickets
-  const [summary, setSummary] = useState({
-    total_tickets: 0,
-    open_tickets: 0,
-    resolved_tickets: 0,
-    pending_tickets: 0,
-  });
-  const [recentTickets, setRecentTickets] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  // Fetch real-time dashboard data from Django API on page load
-  useEffect(() => {
-    async function fetchDashboardData() {
-      const token = localStorage.getItem("access_token");
-
-      try {
-        const response = await fetch("http://localhost:8000/api/dashboard/overview/", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-          },
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          // Update state with real MySQL aggregated counts
-          setSummary(data.summary);
-          setRecentTickets(data.recent_requests || []);
-        } else {
-          console.error("Failed to load dashboard data:", data);
-        }
-      } catch (err) {
-        console.error("Network error while connecting to dashboard API:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchDashboardData();
-  }, []);
-
-  // Format statistics cards using live MySQL data
-  const stats = [
-    { title: "Total Tickets", count: summary.total_tickets, color: "#4f46e5" },
-    { title: "Open", count: summary.open_tickets, color: "#f59e0b" },
-    { title: "Resolved", count: summary.resolved_tickets, color: "#16a34a" },
-    { title: "Pending", count: summary.pending_tickets, color: "#dc2626" },
-  ];
-
-  const weeklyData = [
-    { day: "Mon", tickets: summary.open_tickets },
-    { day: "Tue", tickets: summary.pending_tickets },
-    { day: "Wed", tickets: summary.resolved_tickets },
-    { day: "Thu", tickets: summary.total_tickets },
-    { day: "Fri", tickets: summary.open_tickets },
-    { day: "Sat", tickets: 2 },
-    { day: "Sun", tickets: summary.total_tickets },
-  ];
->>>>>>> c831d98fc837eff214248bda2845a8079fbb5ffe
 
   return (
     <div className="dashboard-page">
@@ -274,12 +243,12 @@ function Dashboard() {
         Welcome back! Here is your support summary.
       </p>
 
-<<<<<<< HEAD
       <div className="dash-filters">
         <div className="dash-range">
           {ranges.map((r) => (
             <button
               key={r.label}
+              type="button"
               className={rangeDays === r.days ? "active" : ""}
               onClick={() => setRangeDays(r.days)}
             >
@@ -287,7 +256,6 @@ function Dashboard() {
             </button>
           ))}
         </div>
-
         <div className="dash-selects">
           <label>
             Status
@@ -298,30 +266,21 @@ function Dashboard() {
               <option>Resolved</option>
             </select>
           </label>
-
           <label>
             Priority
-            <select
-              value={priority}
-              onChange={(e) => setPriority(e.target.value)}
-            >
+            <select value={priority} onChange={(e) => setPriority(e.target.value)}>
               <option>All</option>
               <option>High</option>
               <option>Medium</option>
               <option>Low</option>
             </select>
           </label>
-
-          <button className="dash-reset" onClick={resetFilters}>
+          <button type="button" className="dash-reset" onClick={resetFilters}>
             Reset
           </button>
         </div>
       </div>
 
-      {/* Stats cards */}
-=======
-      {/* Top Statistic Cards */}
->>>>>>> c831d98fc837eff214248bda2845a8079fbb5ffe
       <div className="stats-container">
         {stats.map((item) => (
           <div
@@ -330,18 +289,13 @@ function Dashboard() {
             style={{ borderLeftColor: item.color }}
           >
             <p>{item.title}</p>
-            <h3>{loading ? "..." : item.count}</h3>
+            <h3>{item.count}</h3>
           </div>
         ))}
       </div>
 
-      {/* Weekly Chart */}
       <div className="dash-box">
-<<<<<<< HEAD
         <h3>Tickets by Day</h3>
-=======
-        <h3>Tickets Summary Chart</h3>
->>>>>>> c831d98fc837eff214248bda2845a8079fbb5ffe
         <ResponsiveContainer width="100%" height={250}>
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgb(41, 62, 104)" />
@@ -361,17 +315,8 @@ function Dashboard() {
         </ResponsiveContainer>
       </div>
 
-      {/* Recent Support Requests Table */}
       <div className="dash-box">
-<<<<<<< HEAD
-        <h3>Recent Tickets</h3>
-        <p className="dash-count">
-          Showing {shownTickets.length} of {filteredTickets.length} tickets
-        </p>
-
-=======
         <h3>Recent Support Tickets</h3>
->>>>>>> c831d98fc837eff214248bda2845a8079fbb5ffe
         <table>
           <thead>
             <tr>
@@ -384,8 +329,7 @@ function Dashboard() {
             </tr>
           </thead>
           <tbody>
-<<<<<<< HEAD
-            {shownTickets.map((ticket) => (
+            {filteredTickets.slice(0, 8).map((ticket) => (
               <tr key={ticket.id}>
                 <td>{ticket.id}</td>
                 <td>{ticket.customer}</td>
@@ -400,35 +344,12 @@ function Dashboard() {
                   <span className={"dash-badge " + ticket.status.toLowerCase()}>
                     {ticket.status}
                   </span>
-=======
-            {recentTickets.length === 0 ? (
-              <tr>
-                <td colSpan="5" style={{ textAlign: "center", padding: "16px" }}>
-                  {loading ? "Loading tickets..." : "No support tickets found in database."}
->>>>>>> c831d98fc837eff214248bda2845a8079fbb5ffe
                 </td>
+                <td>{ticket.priority}</td>
               </tr>
-            ) : (
-              recentTickets.map((ticket) => (
-                <tr key={ticket.id}>
-                  <td>{ticket.ticket_id}</td>
-                  <td>{ticket.customer?.username || "N/A"}</td>
-                  <td>{ticket.title}</td>
-                  <td>
-                    <span className={"dash-badge " + ticket.status?.toLowerCase()}>
-                      {ticket.status}
-                    </span>
-                  </td>
-                  <td>{ticket.priority}</td>
-                </tr>
-              ))
-            )}
+            ))}
           </tbody>
         </table>
-
-        {shownTickets.length === 0 && (
-          <p className="dash-empty">No tickets found</p>
-        )}
       </div>
     </div>
   );

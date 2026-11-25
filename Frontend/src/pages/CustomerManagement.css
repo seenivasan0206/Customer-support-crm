@@ -1,13 +1,12 @@
-
 .customers-page {
-  background-color: #102b60;
+  background-color: rgb(19, 35, 73);
   color: white;
   padding: 30px;
   min-height: 100vh;
 }
 
 .customers-heading p {
-  color: #c5d8f5;
+  color: #b8c5dc;
   font-size: 14px;
 }
 
@@ -25,15 +24,15 @@
 }
 
 .customer-card {
-  background-color: #204d91;
-  border: 1px solid #477bbd;
+  background-color: rgb(30, 49, 88);
+  border: 1px solid rgb(41, 62, 104);
   border-radius: 10px;
   padding: 20px;
   flex: 1;
 }
 
 .customer-card h3 {
-  color: #d5e5ff;
+  color: #b8c5dc;
   font-size: 15px;
 }
 
@@ -44,13 +43,13 @@
 }
 
 .customer-card p {
-  color: #d5e5ff;
+  color: #b8c5dc;
   font-size: 13px;
 }
 
 .customer-list-section {
-  background-color: #204d91;
-  border: 1px solid #477bbd;
+  background-color: rgb(30, 49, 88);
+  border: 1px solid rgb(41, 62, 104);
   border-radius: 10px;
   padding: 25px;
 }
@@ -68,7 +67,7 @@
 }
 
 .customer-list-heading p {
-  color: #d5e5ff;
+  color: #b8c5dc;
 }
 
 .customer-toolbar {
@@ -85,34 +84,36 @@
 .customer-toolbar select,
 .customer-form input,
 .customer-form select {
-  background-color: #173c78;
+  background-color: rgb(40, 62, 105);
   color: white;
-  border: 1px solid #79a6df;
-  border-radius: 6px;
+  border: 1px solid rgb(41, 62, 104);
+  border-radius: 8px;
   padding: 12px;
 }
 
 .customer-toolbar input::placeholder,
 .customer-form input::placeholder {
-  color: #c5d8f5;
+  color: #b8c5dc;
 }
 
 .customer-list-section button {
-  background-color: #2563eb;
+  background-color: rgb(62, 82, 212);
   color: white;
   border: none;
   padding: 11px 18px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
 }
 
 .customer-list-section button:hover {
-  background-color: #1d4ed8;
+  background-color: rgb(81, 69, 216);
 }
 
 .customer-form {
-  background-color: #173c78;
-  border: 1px solid #477bbd;
+  background-color: rgb(40, 62, 105);
+  border: 1px solid rgb(41, 62, 104);
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 20px;
@@ -120,6 +121,7 @@
 
 .customer-form h3 {
   color: white;
+  margin-top: 0;
 }
 
 .customer-form input,
@@ -141,24 +143,25 @@
 }
 
 .customer-table th {
-  background-color: #173c78;
+  background-color: rgb(30, 49, 88);
   color: white;
   padding: 15px;
   text-align: left;
+  border-bottom: 1px solid rgb(41, 62, 104);
 }
 
 .customer-table td {
   color: white;
   padding: 15px;
-  border-bottom: 1px solid #477bbd;
+  border-bottom: 1px solid rgb(41, 62, 104);
 }
 
 .customer-table tr:hover {
-  background-color: #28599a;
+  background-color: rgb(40, 62, 105);
 }
 
 .active-status {
-  background-color: #166534;
+  background-color: #16a34a;
   color: white;
   padding: 5px 12px;
   border-radius: 15px;
@@ -166,7 +169,7 @@
 }
 
 .inactive-status {
-  background-color: #92400e;
+  background-color: #dc2626;
   color: white;
   padding: 5px 12px;
   border-radius: 15px;
@@ -174,16 +177,16 @@
 }
 
 .customer-list-section .delete-customer {
-  background-color: #dc3545;
+  background-color: #dc2626;
   padding: 7px 12px;
 }
 
 .customer-list-section .delete-customer:hover {
-  background-color: #b52a37;
+  background-color: #b91c1c;
 }
 
 .no-customers {
-  color: #d5e5ff;
+  color: #b8c5dc;
   text-align: center;
   padding: 20px;
 }
