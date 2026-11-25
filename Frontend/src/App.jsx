@@ -11,6 +11,7 @@ import Settings from "./pages/Settings";
 import Customers from "./pages/CustomerManagement";
 import Agents from "./pages/Agents";
 import ConversationsAndLiveChats from "./pages/ConversationsAndLiveChats";
+import HelpAndSupport from "./pages/HelpAndSupport";
 
 import "./App.css";
 
@@ -67,12 +68,10 @@ function App() {
     window.location.hash = "/dashboard";
   }
 
-  // Secure Logout: Calls Django Logout API and clears tokens
   async function handleLogout() {
     const token = localStorage.getItem("access_token");
     const refreshToken = localStorage.getItem("refresh_token");
 
-    // Call Backend Logout API to blacklist refresh token
     if (token && refreshToken) {
       try {
         await fetch("http://localhost:8000/api/accounts/logout/", {
@@ -88,7 +87,6 @@ function App() {
       }
     }
 
-    // Clear all stored credentials
     localStorage.clear();
     sessionStorage.removeItem("isLoggedIn");
     setIsLoggedIn(false);
@@ -105,6 +103,10 @@ function App() {
 
   const renderPage = () => {
     const pageLower = page.toLowerCase();
+
+    if (pageLower === "help") {
+      return <HelpAndSupport onNavigate={changePage} />;
+    }
 
     if (
       pageLower.includes("support") ||
@@ -136,6 +138,9 @@ function App() {
       case "conversations":
         return <ConversationsAndLiveChats />;
 
+      case "help":
+        return <HelpAndSupport onNavigate={changePage} />;
+
       default:
         return <h2>Page Not Found</h2>;
     }
@@ -150,7 +155,11 @@ function App() {
       />
 
       <div className="main-section">
-        <Header onLogout={handleLogout} />
+        <Header
+          onLogout={handleLogout}
+          onProfileClick={() => changePage("settings")}
+          onHelpClick={() => changePage("help")}
+        />
 
         <div className="page-content">{renderPage()}</div>
       </div>

@@ -9,28 +9,19 @@ from tickets.serializers import TicketSerializer
 
 
 class DashboardOverviewView(APIView):
-    """
-    Dashboard Overview API:
-    Calculates real-time ticket statistics from MySQL database
-    using optimized Django ORM database aggregations.
-    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
         queryset = Ticket.objects.all()
 
-        # 1. Role-based Scoping
-        if user.role == 'ADMIN' or user.is_staff:
-            pass  # Admin views complete CRM system statistics
-        elif user.role == 'AGENT':
-            # Agent views statistics for assigned and unassigned tickets
+        if getattr(user, 'role', '') == 'ADMIN' or user.is_staff or user.is_superuser:
+            pass
+        elif getattr(user, 'role', '') == 'AGENT':
             queryset = queryset.filter(Q(assigned_to=user) | Q(assigned_to__isnull=True))
         else:
-            # Customer views statistics for their own tickets
             queryset = queryset.filter(customer=user)
 
-        # 2. Database Aggregation (Calculated in a single SQL query)
         stats = queryset.aggregate(
             total_tickets=Count('id'),
             open_tickets=Count('id', filter=Q(status='OPEN')),
@@ -43,11 +34,9 @@ class DashboardOverviewView(APIView):
             urgent_priority=Count('id', filter=Q(priority='URGENT')),
         )
 
-        # 3. Recent Support Requests (Latest 5 tickets)
         recent_tickets = queryset.select_related('customer', 'assigned_to').order_by('-created_at')[:5]
         recent_serialized = TicketSerializer(recent_tickets, many=True).data
 
-        # 4. Formatted Response Payload for Frontend React Dashboard
         data = {
             "summary": {
                 "total_tickets": stats['total_tickets'] or 0,
