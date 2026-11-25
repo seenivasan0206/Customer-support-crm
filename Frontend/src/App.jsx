@@ -15,7 +15,7 @@ import SupportRequests from "./pages/SupportRequests";
 import KnowledgeBase from "./pages/KnowledgeBase";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
-import Customers from "./pages/CustomersManagement";
+import Customers from "./pages/CustomerManagement";
 import Agents from "./pages/Agents";
 import ConversationsAndLiveChats from "./pages/ConversationsAndLiveChats";
 

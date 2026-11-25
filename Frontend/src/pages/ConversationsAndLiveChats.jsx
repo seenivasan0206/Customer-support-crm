@@ -1,63 +1,50 @@
+
 import React, { useState } from 'react';
+import './ConversationsAndLiveChats.css';
 
 function ConversationsAndLiveChats() {
 
-  var [search, setSearch] = useState('');
-  var [selectedConversation, setSelectedConversation] = useState('');
-  var [message, setMessage] = useState('');
-  var [chatMessages, setChatMessages] = useState({});
-
   var [conversations, setConversations] = useState([
     {
-      name: 'Muvendhan',
-      lastMessage: 'I need help with my order',
-      status: 'Open',
-      agent: 'Support Agent',
-      time: '10:30 AM'
-    },
-    {
-      name: 'Shiva',
-      lastMessage: 'Where is my order?',
-      status: 'Pending',
-      agent: 'Support Agent',
-      time: '10:45 AM'
+    
     }
   ]);
+  var [selectedConversation, setSelectedConversation] = useState(null);
+  var [message, setMessage] = useState('');
+  var [chatMessages, setChatMessages] = useState([]);
 
-  var filteredConversations = conversations.filter((conversation) => {
-    return conversation.name.toLowerCase().includes(search.toLowerCase());
-  });
-
-  function sendMessage() {
-
-    if (message.trim() !== '' && selectedConversation !== '') {
-
-      setChatMessages({
-        ...chatMessages,
-        [selectedConversation]: [
-          ...(chatMessages[selectedConversation] || []),
-          message
-        ]
-      });
-
-      setMessage('');
-    }
+  function selectConversation(conversation) {
+    setSelectedConversation(conversation);
+    setChatMessages([]);
   }
 
-  function clearMessages() {
+  function sendMessage() {
+    if (message.trim() === '') {
+      return;
+    }
 
-    setChatMessages({
-      ...chatMessages,
-      [selectedConversation]: []
-    });
+    if (selectedConversation === null) {
+      return;
+    }
+
+    var newMessage = {
+      text: message,
+      sender: 'Agent'
+    };
+
+    setChatMessages([...chatMessages, newMessage]);
+    setMessage('');
   }
 
   return (
     <div className="conversations-page">
 
-      <h1>Conversations & Live Chats</h1>
+      <div className="conversations-header">
+        <h1>Conversations & Live Chat</h1>
+        <p>Manage customer conversations and respond to messages.</p>
+      </div>
 
-      <div className="conversations-container">
+      <div className="chat-container">
 
         <div className="conversation-list">
 
@@ -66,81 +53,65 @@ function ConversationsAndLiveChats() {
           <input
             type="text"
             placeholder="Search conversations..."
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
           />
 
-          {filteredConversations.map((conversation, index) => {
-
-            return (
-              <div className="conversation" key={index}>
-
+          {conversations.length === 0 ? (
+            <p className="no-conversations">
+              No conversations available.
+            </p>
+          ) : (
+            conversations.map((conversation, index) => (
+              <div
+                className="conversation-item"
+                key={index}
+                onClick={() => selectConversation(conversation)}
+              >
                 <h3>{conversation.name}</h3>
-
                 <p>{conversation.lastMessage}</p>
-
-                <p>Status: {conversation.status}</p>
-
-                <p>Assigned to: {conversation.agent}</p>
-
-                <p>{conversation.time}</p>
-
-                <button
-                  onClick={() => setSelectedConversation(conversation.name)}
-                >
-                  View Conversation
-                </button>
-
+                <span>{conversation.status}</span>
               </div>
-            );
-          })}
+            ))
+          )}
 
         </div>
 
-        {selectedConversation !== '' && (
+        <div className="chat-section">
 
-          <div className="chat-container">
-
-            <h2>Chat with {selectedConversation}</h2>
-
-            <div className="chat-messages">
-
-              <p>Customer: Hello, I need help.</p>
-
-              <p>Agent: Sure, I'd be happy to help.</p>
-
-              {(chatMessages[selectedConversation] || []).map((chat, index) => {
-
-                return (
-                  <p key={index}>Agent: {chat}</p>
-                );
-
-              })}
-
+          {selectedConversation === null ? (
+            <div className="empty-chat">
+              <h2>Select a conversation</h2>
+              <p>Choose a conversation to view messages.</p>
             </div>
+          ) : (
+            <>
+              <div className="chat-header">
+                <h2>{selectedConversation.name}</h2>
+              </div>
 
-            <button onClick={clearMessages}>
-              Clear Messages
-            </button>
+              <div className="chat-messages">
+                {chatMessages.map((chat, index) => (
+                  <p key={index} className="agent-message">
+                    {chat.sender}: {chat.text}
+                  </p>
+                ))}
+              </div>
 
-            <div className="chat-input">
+              <div className="chat-input">
+                <input
+                  type="text"
+                  placeholder="Type your message..."
+                  value={message}
+                  onChange={(event) => setMessage(event.target.value)}
+                />
 
-              <input
-                type="text"
-                placeholder="Type your message..."
-                value={message}
-                onChange={(event) => setMessage(event.target.value)}
-              />
+                <button onClick={sendMessage}>
+                  Send
+                </button>
+              </div>
+            </>
+          )}
 
-              <button onClick={sendMessage}>
-                Send
-              </button>
-
-            </div>
-
-          </div>
-
-        )}
+        </div>
 
       </div>
 

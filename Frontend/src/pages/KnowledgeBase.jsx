@@ -4,10 +4,10 @@ import "./KnowledgeBase.css";
 import { filterArticles, mergeById } from "./knowledgeBaseUtils";
 
 const apiBase = (
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api"
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api"  // API
 ).replace(/\/$/, "");
-const articlesUrl = `${apiBase}/knowledge/articles/`;
-const categoriesUrl = `${apiBase}/knowledge/categories/`;
+const articlesUrl = `${apiBase}/knowledge/articles/`;  //        ------------------------ for articles
+const categoriesUrl = `${apiBase}/knowledge/categories/`; // ---------------------- for categories
 
 async function request(url, options = {}) {
   let response;
@@ -44,7 +44,7 @@ async function request(url, options = {}) {
   return data;
 }
 
-async function fetchArticles(signal, url = articlesUrl) {
+async function fetchArticles(signal, url = articlesUrl) {           // -----------------------------------
   const data = await request(url, { method: "GET", signal });
   const articles = Array.isArray(data) ? data : data.results;
   if (!Array.isArray(articles))
@@ -52,7 +52,7 @@ async function fetchArticles(signal, url = articlesUrl) {
   return { articles, next: Array.isArray(data) ? null : data.next };
 }
 
-async function fetchCategories(signal, url = categoriesUrl) {
+async function fetchCategories(signal, url = categoriesUrl) {       // -----------------------------------
   const data = await request(url, { method: "GET", signal });
   const categories = Array.isArray(data) ? data : data.results;
   if (!Array.isArray(categories))
@@ -61,7 +61,7 @@ async function fetchCategories(signal, url = categoriesUrl) {
 }
 
 function createArticle(title, content, summary, category, status, slug, author, signal) {
-  return request(articlesUrl, {
+  return request(articlesUrl, {                           // ----------------------------
     method: "POST",
     headers: { "Content-Type": "application/json" },
     signal,
@@ -79,7 +79,7 @@ function createArticle(title, content, summary, category, status, slug, author, 
 
 function saveCategory(id, name, description, signal) {
   return request(
-    id === null ? categoriesUrl : `${categoriesUrl}${encodeURIComponent(id)}/`,
+    id === null ? categoriesUrl : `${categoriesUrl}${encodeURIComponent(id)}/`,    // ----------------------
     {
       method: id === null ? "POST" : "PATCH",
       headers: { "Content-Type": "application/json" },
