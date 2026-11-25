@@ -20,7 +20,7 @@ const ranges = [
 const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 function Dashboard() {
-  const [rangeDays, setRangeDays] = useState(9999);
+  const [rangeDays, setRangeDays] = useState(30);
   const [status, setStatus] = useState("All");
   const [priority, setPriority] = useState("All");
 
@@ -50,39 +50,54 @@ function Dashboard() {
           }),
         ]);
 
+        let overviewData = null;
         if (overviewRes.ok) {
-          const overviewData = await overviewRes.json();
+          overviewData = await overviewRes.json();
           setDbSummary(overviewData.summary);
         }
 
+        let rawTicketsList = [];
         if (ticketsRes.ok) {
           const ticketsData = await ticketsRes.json();
-          const list = ticketsData.results || ticketsData || [];
-          const normalized = list.map((t) => {
-            const created = t.created_at ? new Date(t.created_at) : new Date();
-            const daysAgo = Math.max(
-              0,
-              Math.floor((Date.now() - created.getTime()) / (24 * 60 * 60 * 1000))
-            );
-            const statusFormatted = t.status
-              ? t.status.charAt(0).toUpperCase() + t.status.slice(1).toLowerCase()
-              : "Open";
-            const priorityFormatted = t.priority
-              ? t.priority.charAt(0).toUpperCase() + t.priority.slice(1).toLowerCase()
-              : "Medium";
-
-            return {
-              id: `#${t.id}`,
-              customer: t.customer_name || (t.customer ? `Customer #${t.customer}` : "Support User"),
-              subject: t.title,
-              status: statusFormatted,
-              priority: priorityFormatted,
-              daysAgo: daysAgo,
-              created_at: created,
-            };
-          });
-          setDbTickets(normalized);
+          rawTicketsList = Array.isArray(ticketsData)
+            ? ticketsData
+            : ticketsData.results || [];
+        } else if (overviewData && overviewData.recent_requests) {
+          rawTicketsList = overviewData.recent_requests;
         }
+
+        const normalized = rawTicketsList.map((t) => {
+          const created = t.created_at ? new Date(t.created_at) : new Date();
+          const daysAgo = Math.max(
+            0,
+            Math.floor((Date.now() - created.getTime()) / (24 * 60 * 60 * 1000))
+          );
+          const statusFormatted = t.status
+            ? t.status.charAt(0).toUpperCase() + t.status.slice(1).toLowerCase()
+            : "Open";
+          const priorityFormatted = t.priority
+            ? t.priority.charAt(0).toUpperCase() + t.priority.slice(1).toLowerCase()
+            : "Medium";
+          const customerName =
+            t.customer?.username ||
+            (t.customer?.first_name
+              ? `${t.customer.first_name} ${t.customer.last_name || ""}`.trim()
+              : null) ||
+            t.customer_name ||
+            (typeof t.customer === "string" ? t.customer : "Support User");
+
+          return {
+            id: t.ticket_id || `#${t.id}`,
+            customer: customerName,
+            subject: t.title,
+            status: statusFormatted,
+            priority: priorityFormatted,
+            daysAgo: daysAgo,
+            created_at: created,
+          };
+        });
+
+        setDbTickets(normalized);
       } catch (err) {
         console.error("Network error while connecting to dashboard API:", err);
       } finally {
@@ -119,29 +134,29 @@ function Dashboard() {
     {
       title: "Open",
       count: isFiltered
-        ? filteredTickets.filter((t) => t.status === "Open").length
-        : dbSummary?.open_tickets ?? filteredTickets.filter((t) => t.status === "Open").length,
+        ? filteredTickets.filter((t) => t.status.toLowerCase() === "open").length
+        : dbSummary?.open_tickets ?? dbTickets.filter((t) => t.status.toLowerCase() === "open").length,
       color: "#f59e0b",
     },
     {
       title: "Resolved",
       count: isFiltered
-        ? filteredTickets.filter((t) => t.status === "Resolved").length
-        : dbSummary?.resolved_tickets ?? filteredTickets.filter((t) => t.status === "Resolved").length,
+        ? filteredTickets.filter((t) => t.status.toLowerCase() === "resolved").length
+        : dbSummary?.resolved_tickets ?? dbTickets.filter((t) => t.status.toLowerCase() === "resolved").length,
       color: "#16a34a",
     },
     {
       title: "Pending",
       count: isFiltered
-        ? filteredTickets.filter((t) => t.status === "Pending").length
-        : dbSummary?.pending_tickets ?? filteredTickets.filter((t) => t.status === "Pending").length,
+        ? filteredTickets.filter((t) => t.status.toLowerCase() === "pending").length
+        : dbSummary?.pending_tickets ?? dbTickets.filter((t) => t.status.toLowerCase() === "pending").length,
       color: "#dc2626",
     },
   ];
 
   const chartData = weekDays.map((day, idx) => {
     const dayOffset = (new Date().getDay() - 1 - idx + 7) % 7;
-    const count = dbTickets.filter((t) => t.daysAgo === dayOffset).length;
+    const count = filteredTickets.filter((t) => t.daysAgo === dayOffset).length;
     return { day, tickets: count };
   });
 
@@ -165,6 +180,7 @@ function Dashboard() {
             </button>
           ))}
         </div>
+
         <div className="dash-selects">
           <label>
             Status
@@ -175,21 +191,27 @@ function Dashboard() {
               <option>Resolved</option>
             </select>
           </label>
+
           <label>
             Priority
-            <select value={priority} onChange={(e) => setPriority(e.target.value)}>
+            <select
+              value={priority}
+              onChange={(e) => setPriority(e.target.value)}
+            >
               <option>All</option>
               <option>High</option>
               <option>Medium</option>
               <option>Low</option>
             </select>
           </label>
+
           <button type="button" className="dash-reset" onClick={resetFilters}>
             Reset
           </button>
         </div>
       </div>
 
+      {/* Top Statistic Cards */}
       <div className="stats-container">
         {stats.map((item) => (
           <div
@@ -198,13 +220,13 @@ function Dashboard() {
             style={{ borderLeftColor: item.color }}
           >
             <p>{item.title}</p>
-            <h3>{item.count}</h3>
+            <h3>{loading && !dbSummary && dbTickets.length === 0 ? "..." : item.count}</h3>
           </div>
         ))}
       </div>
 
       <div className="dash-box">
-        <h3>Tickets by Day</h3>
+        <h3>Tickets Summary Chart</h3>
         <ResponsiveContainer width="100%" height={250}>
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgb(41, 62, 104)" />
@@ -238,31 +260,38 @@ function Dashboard() {
             </tr>
           </thead>
           <tbody>
-            {filteredTickets.slice(0, 8).map((ticket) => (
-              <tr key={ticket.id}>
-                <td>{ticket.id}</td>
-                <td>{ticket.customer}</td>
-                <td>{ticket.subject}</td>
-                <td>
-                  {new Date(ticket.created_at).toLocaleDateString("en-IN", {
-                    day: "2-digit",
-                    month: "short",
-                  })}
-                </td>
-                <td>
-                  <span className={"dash-badge " + ticket.status.toLowerCase()}>
-                    {ticket.status}
-                  </span>
-                </td>
-                <td>{ticket.priority}</td>
-              </tr>
-            ))}
-            {filteredTickets.length === 0 && (
+            {loading && dbTickets.length === 0 ? (
               <tr>
                 <td colSpan="6" style={{ textAlign: "center", padding: "24px", color: "#8b93a7" }}>
-                  {loading ? "Loading tickets from database..." : "No support tickets found in database. Create one in Support Requests."}
+                  Loading tickets from database...
                 </td>
               </tr>
+            ) : filteredTickets.length === 0 ? (
+              <tr>
+                <td colSpan="6" style={{ textAlign: "center", padding: "24px", color: "#8b93a7" }}>
+                  No support tickets found in database. Create one in Support Requests.
+                </td>
+              </tr>
+            ) : (
+              filteredTickets.slice(0, 8).map((ticket) => (
+                <tr key={ticket.id}>
+                  <td>{ticket.id}</td>
+                  <td>{ticket.customer}</td>
+                  <td>{ticket.subject}</td>
+                  <td>
+                    {new Date(ticket.created_at).toLocaleDateString("en-IN", {
+                      day: "2-digit",
+                      month: "short",
+                    })}
+                  </td>
+                  <td>
+                    <span className={"dash-badge " + ticket.status.toLowerCase()}>
+                      {ticket.status}
+                    </span>
+                  </td>
+                  <td>{ticket.priority}</td>
+                </tr>
+              ))
             )}
           </tbody>
         </table>
