@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -11,59 +11,65 @@ import {
 import "./Dashboard.css";
 
 function Dashboard() {
+  // State for dashboard metrics and live tickets
+  const [summary, setSummary] = useState({
+    total_tickets: 0,
+    open_tickets: 0,
+    resolved_tickets: 0,
+    pending_tickets: 0,
+  });
+  const [recentTickets, setRecentTickets] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch real-time dashboard data from Django API on page load
+  useEffect(() => {
+    async function fetchDashboardData() {
+      const token = localStorage.getItem("access_token");
+
+      try {
+        const response = await fetch("http://localhost:8000/api/dashboard/overview/", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // Update state with real MySQL aggregated counts
+          setSummary(data.summary);
+          setRecentTickets(data.recent_requests || []);
+        } else {
+          console.error("Failed to load dashboard data:", data);
+        }
+      } catch (err) {
+        console.error("Network error while connecting to dashboard API:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchDashboardData();
+  }, []);
+
+  // Format statistics cards using live MySQL data
   const stats = [
-    { title: "Total Tickets", count: 120, color: "#4f46e5" },
-    { title: "Open", count: 45, color: "#f59e0b" },
-    { title: "Resolved", count: 60, color: "#16a34a" },
-    { title: "Pending", count: 15, color: "#dc2626" },
+    { title: "Total Tickets", count: summary.total_tickets, color: "#4f46e5" },
+    { title: "Open", count: summary.open_tickets, color: "#f59e0b" },
+    { title: "Resolved", count: summary.resolved_tickets, color: "#16a34a" },
+    { title: "Pending", count: summary.pending_tickets, color: "#dc2626" },
   ];
 
   const weeklyData = [
-    { day: "Mon", tickets: 12 },
-    { day: "Tue", tickets: 18 },
-    { day: "Wed", tickets: 9 },
-    { day: "Thu", tickets: 22 },
-    { day: "Fri", tickets: 15 },
-    { day: "Sat", tickets: 7 },
-    { day: "Sun", tickets: 11 },
-  ];
-
-  const recentTickets = [
-    {
-      id: "#1001",
-      customer: "Naveen Kumar",
-      subject: "Unable to login",
-      status: "Open",
-      priority: "High",
-    },
-    {
-      id: "#1002",
-      customer: "Sathish Kumar",
-      subject: "Payment not received",
-      status: "Pending",
-      priority: "Medium",
-    },
-    {
-      id: "#1003",
-      customer: "Arun Raj",
-      subject: "Change email address",
-      status: "Resolved",
-      priority: "Low",
-    },
-    {
-      id: "#1004",
-      customer: "Muvendhan",
-      subject: "App is crashing",
-      status: "Open",
-      priority: "High",
-    },
-    {
-      id: "#1005",
-      customer: "Ashok Kumar",
-      subject: "Refund request",
-      status: "Resolved",
-      priority: "Medium",
-    },
+    { day: "Mon", tickets: summary.open_tickets },
+    { day: "Tue", tickets: summary.pending_tickets },
+    { day: "Wed", tickets: summary.resolved_tickets },
+    { day: "Thu", tickets: summary.total_tickets },
+    { day: "Fri", tickets: summary.open_tickets },
+    { day: "Sat", tickets: 2 },
+    { day: "Sun", tickets: summary.total_tickets },
   ];
 
   return (
@@ -73,6 +79,7 @@ function Dashboard() {
         Welcome back! Here is your support summary.
       </p>
 
+      {/* Top Statistic Cards */}
       <div className="stats-container">
         {stats.map((item) => (
           <div
@@ -81,13 +88,14 @@ function Dashboard() {
             style={{ borderLeftColor: item.color }}
           >
             <p>{item.title}</p>
-            <h3>{item.count}</h3>
+            <h3>{loading ? "..." : item.count}</h3>
           </div>
         ))}
       </div>
 
+      {/* Weekly Chart */}
       <div className="dash-box">
-        <h3>Tickets This Week</h3>
+        <h3>Tickets Summary Chart</h3>
         <ResponsiveContainer width="100%" height={250}>
           <BarChart data={weeklyData}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgb(41, 62, 104)" />
@@ -107,12 +115,13 @@ function Dashboard() {
         </ResponsiveContainer>
       </div>
 
+      {/* Recent Support Requests Table */}
       <div className="dash-box">
-        <h3>Recent Tickets</h3>
+        <h3>Recent Support Tickets</h3>
         <table>
           <thead>
             <tr>
-              <th>ID</th>
+              <th>Ticket ID</th>
               <th>Customer</th>
               <th>Subject</th>
               <th>Status</th>
@@ -120,19 +129,27 @@ function Dashboard() {
             </tr>
           </thead>
           <tbody>
-            {recentTickets.map((ticket) => (
-              <tr key={ticket.id}>
-                <td>{ticket.id}</td>
-                <td>{ticket.customer}</td>
-                <td>{ticket.subject}</td>
-                <td>
-                  <span className={"dash-badge " + ticket.status.toLowerCase()}>
-                    {ticket.status}
-                  </span>
+            {recentTickets.length === 0 ? (
+              <tr>
+                <td colSpan="5" style={{ textAlign: "center", padding: "16px" }}>
+                  {loading ? "Loading tickets..." : "No support tickets found in database."}
                 </td>
-                <td>{ticket.priority}</td>
               </tr>
-            ))}
+            ) : (
+              recentTickets.map((ticket) => (
+                <tr key={ticket.id}>
+                  <td>{ticket.ticket_id}</td>
+                  <td>{ticket.customer?.username || "N/A"}</td>
+                  <td>{ticket.title}</td>
+                  <td>
+                    <span className={"dash-badge " + ticket.status?.toLowerCase()}>
+                      {ticket.status}
+                    </span>
+                  </td>
+                  <td>{ticket.priority}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

@@ -1,110 +1,151 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./SupportRequests.css";
 
 function SupportRequests() {
- 
-  const [tickets, setTickets] = useState([
-    {
-      id: 1001,
-      customer: "Naveen Kumar",
-      subject: "Unable to login",
-      status: "Open",
-      priority: "High",
-    },
-    {
-      id: 1002,
-      customer: "Sathish Kumar",
-      subject: "Payment not received",
-      status: "Pending",
-      priority: "Medium",
-    },
-    {
-      id: 1003,
-      customer: "Arun Raj",
-      subject: "Change email address",
-      status: "Resolved",
-      priority: "Low",
-    },
-    {
-      id: 1004,
-      customer: "Muvendhan",
-      subject: "App is crashing",
-      status: "Open",
-      priority: "High",
-    },
-    {
-      id: 1005,
-      customer: "Ashok Kumar",
-      subject: "Refund request",
-      status: "Resolved",
-      priority: "Medium",
-    },
-  ]);
+  const [tickets, setTickets] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  // Search & Filter state
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [showForm, setShowForm] = useState(false);
 
-  
-  const [customer, setCustomer] = useState("");
+  // Form input state
   const [subject, setSubject] = useState("");
+  const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("Medium");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  
-  function handleAdd(e) {
-    e.preventDefault();
+  const token = localStorage.getItem("access_token");
 
-    const ids = tickets.map((t) => t.id);
-    const newId = Math.max(...ids, 1000) + 1;
+  // 1. Fetch tickets from Django Backend API
+  async function fetchTickets() {
+    setLoading(true);
+    try {
+      let url = "http://localhost:8000/api/tickets/";
+      const params = new URLSearchParams();
 
-    const newTicket = {
-      id: newId,
-      customer: customer,
-      subject: subject,
-      status: "Open",
-      priority: priority,
-    };
+      if (search) params.append("search", search);
+      if (statusFilter !== "All") params.append("status", statusFilter.toUpperCase());
 
-    setTickets([...tickets, newTicket]);
+      if (params.toString()) {
+        url += `?${params.toString()}`;
+      }
 
-    
-    setCustomer("");
-    setSubject("");
-    setPriority("Medium");
-    setShowForm(false);
-  }
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+      });
 
-  
-  function handleDelete(id) {
-    if (window.confirm("Are you sure you want to delete this ticket?")) {
-      const updated = tickets.filter((t) => t.id !== id);
-      setTickets(updated);
+      const data = await response.json();
+      if (response.ok) {
+        setTickets(data.results || []);
+      } else {
+        console.error("Failed to fetch tickets:", data);
+      }
+    } catch (err) {
+      console.error("Error connecting to tickets API:", err);
+    } finally {
+      setLoading(false);
     }
   }
 
-  
-  function handleStatusChange(id, newStatus) {
-    const updated = tickets.map((t) => {
-      if (t.id === id) {
-        return { ...t, status: newStatus };
+  // Load tickets on component mount and when search/filter changes
+  useEffect(() => {
+    fetchTickets();
+  }, [search, statusFilter]);
+
+  // 2. Create New Ticket (POST /api/tickets/)
+  async function handleAdd(e) {
+    e.preventDefault();
+    setErrorMessage("");
+
+    try {
+      const response = await fetch("http://localhost:8000/api/tickets/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title: subject,
+          description: description || subject,
+          priority: priority.toUpperCase(),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Reset form and reload tickets from database
+        setSubject("");
+        setDescription("");
+        setPriority("Medium");
+        setShowForm(false);
+        fetchTickets();
+      } else {
+        setErrorMessage(data.title?.[0] || data.detail || "Failed to create ticket.");
       }
-      return t;
-    });
-    setTickets(updated);
+    } catch (err) {
+      setErrorMessage("Network error while creating ticket.");
+    }
   }
 
-  
-  const filteredTickets = tickets.filter((t) => {
-    const matchSearch =
-      t.customer.toLowerCase().includes(search.toLowerCase()) ||
-      t.subject.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = statusFilter === "All" || t.status === statusFilter;
-    return matchSearch && matchStatus;
-  });
+  // 3. Update Ticket Status (PATCH /api/tickets/:id/)
+  async function handleStatusChange(id, newStatus) {
+    try {
+      const response = await fetch(`http://localhost:8000/api/tickets/${id}/`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          status: newStatus.toUpperCase(),
+        }),
+      });
+
+      if (response.ok) {
+        fetchTickets(); // Refresh tickets list
+      } else {
+        const errorData = await response.json();
+        alert(errorData.detail || "Unable to update ticket status.");
+      }
+    } catch (err) {
+      alert("Network error while updating status.");
+    }
+  }
+
+  // 4. Delete Ticket (DELETE /api/tickets/:id/)
+  async function handleDelete(id) {
+    if (!window.confirm("Are you sure you want to delete this ticket?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:8000/api/tickets/${id}/`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok || response.status === 204) {
+        fetchTickets(); // Remove ticket from UI list
+      } else {
+        const errorData = await response.json();
+        alert(errorData.detail || "You do not have permission to delete this ticket.");
+      }
+    } catch (err) {
+      alert("Network error while deleting ticket.");
+    }
+  }
 
   return (
     <div className="sr-page">
-      
       <div className="sr-header">
         <div>
           <h2>Support Requests</h2>
@@ -115,28 +156,34 @@ function SupportRequests() {
         </button>
       </div>
 
-      
+      {/* Error Banner */}
+      {errorMessage && (
+        <div style={{ color: "#ef4444", marginBottom: "16px" }}>
+          {errorMessage}
+        </div>
+      )}
+
+      {/* New Ticket Form Modal */}
       {showForm && (
         <form className="sr-form" onSubmit={handleAdd}>
           <div>
-            <label>Customer</label>
+            <label>Subject</label>
             <input
               type="text"
-              placeholder="Customer name"
-              value={customer}
-              onChange={(e) => setCustomer(e.target.value)}
+              placeholder="Brief summary of the issue"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
               required
             />
           </div>
 
           <div>
-            <label>Subject</label>
+            <label>Description</label>
             <input
               type="text"
-              placeholder="Issue"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              required
+              placeholder="Detailed description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </div>
 
@@ -146,9 +193,10 @@ function SupportRequests() {
               value={priority}
               onChange={(e) => setPriority(e.target.value)}
             >
-              <option>Low</option>
-              <option>Medium</option>
-              <option>High</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+              <option value="Urgent">Urgent</option>
             </select>
           </div>
 
@@ -158,11 +206,11 @@ function SupportRequests() {
         </form>
       )}
 
-      
+      {/* Search & Filter Toolbar */}
       <div className="sr-toolbar">
         <input
           type="text"
-          placeholder="Search by customer or subject"
+          placeholder="Search by ID, title, or customer"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -171,19 +219,20 @@ function SupportRequests() {
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
         >
-          <option>All</option>
-          <option>Open</option>
-          <option>Pending</option>
-          <option>Resolved</option>
+          <option value="All">All Statuses</option>
+          <option value="Open">Open</option>
+          <option value="Pending">Pending</option>
+          <option value="Resolved">Resolved</option>
+          <option value="Closed">Closed</option>
         </select>
       </div>
 
-      
+      {/* Tickets Table */}
       <div className="sr-table-box">
         <table>
           <thead>
             <tr>
-              <th>ID</th>
+              <th>Ticket ID</th>
               <th>Customer</th>
               <th>Subject</th>
               <th>Status</th>
@@ -192,41 +241,54 @@ function SupportRequests() {
             </tr>
           </thead>
           <tbody>
-            {filteredTickets.map((ticket) => (
-              <tr key={ticket.id}>
-                <td>#{ticket.id}</td>
-                <td>{ticket.customer}</td>
-                <td>{ticket.subject}</td>
-                <td>
-                  <select
-                    className={"sr-status " + ticket.status.toLowerCase()}
-                    value={ticket.status}
-                    onChange={(e) =>
-                      handleStatusChange(ticket.id, e.target.value)
-                    }
-                  >
-                    <option>Open</option>
-                    <option>Pending</option>
-                    <option>Resolved</option>
-                  </select>
-                </td>
-                <td>{ticket.priority}</td>
-                <td>
-                  <button
-                    className="sr-delete"
-                    onClick={() => handleDelete(ticket.id)}
-                  >
-                    Delete
-                  </button>
+            {loading ? (
+              <tr>
+                <td colSpan="6" style={{ textAlign: "center", padding: "20px" }}>
+                  Loading tickets from database...
                 </td>
               </tr>
-            ))}
+            ) : tickets.length === 0 ? (
+              <tr>
+                <td colSpan="6" style={{ textAlign: "center", padding: "20px" }}>
+                  No support tickets found.
+                </td>
+              </tr>
+            ) : (
+              tickets.map((ticket) => (
+                <tr key={ticket.id}>
+                  <td>{ticket.ticket_id}</td>
+                  <td>{ticket.customer?.username || "N/A"}</td>
+                  <td>{ticket.title}</td>
+                  <td>
+                    <select
+                      className={"sr-status " + (ticket.status?.toLowerCase() || "")}
+                      value={
+                        ticket.status
+                          ? ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1).toLowerCase()
+                          : "Open"
+                      }
+                      onChange={(e) => handleStatusChange(ticket.id, e.target.value)}
+                    >
+                      <option value="Open">Open</option>
+                      <option value="Pending">Pending</option>
+                      <option value="Resolved">Resolved</option>
+                      <option value="Closed">Closed</option>
+                    </select>
+                  </td>
+                  <td>{ticket.priority}</td>
+                  <td>
+                    <button
+                      className="sr-delete"
+                      onClick={() => handleDelete(ticket.id)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
-
-        {filteredTickets.length === 0 && (
-          <p className="sr-empty">No tickets found</p>
-        )}
       </div>
     </div>
   );

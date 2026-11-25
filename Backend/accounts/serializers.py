@@ -35,6 +35,15 @@ class RegisterSerializer(serializers.ModelSerializer):
 # 3. Custom Login Serializer (Includes tokens along with user info and role in login response)
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
+        # Allow authentication with either username or email address
+        username_or_email = attrs.get('username')
+        if username_or_email and '@' in username_or_email:
+            try:
+                user = User.objects.get(email__iexact=username_or_email)
+                attrs['username'] = user.username
+            except User.DoesNotExist:
+                pass
+
         data = super().validate(attrs)
 
         # Attach additional user profile data to the login response payload
