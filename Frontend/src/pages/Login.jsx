@@ -24,16 +24,45 @@ function Login({ onLogin }) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-  function handleLogin(e) {
+    async function handleLogin(e) {
     e.preventDefault();
+    setError("");
 
-    if (email === "admin@gmail.com" && password === "admin123") {
-      setError("");
-      onLogin();
-    } else {
-      setError("Invalid email or password");
+    try {
+      
+      const response = await fetch("http://localhost:8000/api/accounts/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: email,
+          password: password,
+        }),
+      });
+
+      const data = await response.json();
+
+      
+      if (response.ok) {
+        
+        localStorage.setItem("access_token", data.access);
+        localStorage.setItem("refresh_token", data.refresh);
+        localStorage.setItem("user_role", data.user.role);
+        localStorage.setItem("username", data.user.username);
+
+        
+        onLogin();
+      } else {
+        
+        setError(data.detail || "Invalid username or password.");
+      }
+    } catch (err) {
+      
+      setError("Unable to connect to server. Please ensure backend server is running.");
     }
   }
+ 
 
   return (
     <div className="login">
@@ -67,7 +96,7 @@ function Login({ onLogin }) {
           {error && <p className="login-error">{error}</p>}
 
           
-          <label>Email</label>
+          <label>Username or Email</label>
           <div className="input-box">
             <span className="input-icon">
               <Icon size={18}>
@@ -76,8 +105,8 @@ function Login({ onLogin }) {
               </Icon>
             </span>
             <input
-              type="email"
-              placeholder="Enter email"
+              type="text"
+              placeholder="Enter username or email"
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);

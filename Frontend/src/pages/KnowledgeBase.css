@@ -1,4 +1,3 @@
-/* Scoped to Knowledge Base; shared app styles remain unchanged. */
 .knowledge {
   color-scheme: dark;
   --kb-bg: #132349;
@@ -325,7 +324,6 @@
   }
 }
 
-/* Editorial hierarchy and compact library controls. */
 .knowledge .kb-heading {
   padding: 28px 30px;
   border: 0;

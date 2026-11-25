@@ -1,0 +1,235 @@
+.login {
+  display: flex;
+  height: 100vh;
+}
+
+
+.login-left {
+  flex: 1.2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 50px;
+  color: white;
+  background-color: rgb(19, 35, 73);
+  background-image:
+    linear-gradient(rgba(19, 35, 73, 0.82), rgba(40, 62, 105, 0.72)),
+    url("/crm-bg.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.login-left h1 {
+  font-size: 36px;
+  margin-bottom: 15px;
+}
+
+.login-left p {
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 25px;
+}
+
+.login-left ul {
+  list-style: none;
+}
+
+.login-left li {
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+
+.login-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(19, 35, 73);
+  padding: 20px;
+  overflow-y: auto;
+}
+
+
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  background-color: rgb(30, 49, 88);
+  border: 1px solid rgb(41, 62, 104);
+  padding: 45px;
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  animation: loginFadeUp 0.5s ease;
+}
+
+@keyframes loginFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.login-logo {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background-color: rgb(62, 82, 212);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 7px rgba(62, 82, 212, 0.25);
+}
+
+.login-card h2 {
+  text-align: center;
+  color: white;
+  font-size: 28px;
+  margin-bottom: 6px;
+}
+
+.login-card .login-sub {
+  text-align: center;
+  color: #b8c5dc;
+  margin-bottom: 24px;
+}
+
+
+.login-card .login-error {
+  background-color: rgba(220, 38, 38, 0.15);
+  border: 1px solid #dc2626;
+  color: #ff9a9a;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  font-size: 14px;
+}
+
+.login-card label {
+  display: block;
+  font-weight: bold;
+  color: #dce5f5;
+  margin-bottom: 8px;
+}
+
+
+.input-box {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.input-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #c0cce0;
+  display: flex;
+}
+
+.login-card .input-box input {
+  width: 100%;
+  padding: 14px 48px 14px 46px;
+  border: 1px solid rgb(41, 62, 104);
+  border-radius: 10px;
+  background-color: rgb(40, 62, 105);
+  color: white;
+  font-size: 15px;
+}
+
+.login-card .input-box input::placeholder {
+  color: #c0cce0;
+}
+
+.login-card .input-box input:focus {
+  outline: none;
+  border-color: rgb(62, 82, 212);
+  box-shadow: 0 0 0 3px rgba(62, 82, 212, 0.3);
+}
+
+
+.login-card .eye-btn {
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: auto;
+  padding: 2px;
+  background: none;
+  border: none;
+  border-radius: 0;
+  color: #c0cce0;
+  display: flex;
+  cursor: pointer;
+}
+
+.login-card .eye-btn:hover {
+  background: none;
+  color: white;
+}
+
+
+.login-options {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.login-card .remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-weight: normal;
+  color: #dce5f5;
+  cursor: pointer;
+}
+
+.login-card .remember input {
+  width: auto;
+  margin: 0;
+  accent-color: rgb(62, 82, 212);
+}
+
+.forgot {
+  color: #8fa2ff;
+  text-decoration: none;
+}
+
+.forgot:hover {
+  text-decoration: underline;
+}
+
+
+.login-card .login-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, rgb(62, 82, 212), rgb(81, 69, 216));
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.login-card .login-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(62, 82, 212, 0.45);
+}
+
+
+@media (max-width: 768px) {
+  .login-left {
+    display: none;
+  }
+}

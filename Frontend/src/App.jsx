@@ -15,7 +15,7 @@ import ConversationsAndLiveChats from "./pages/ConversationsAndLiveChats";
 import "./App.css";
 
 function isSavedLogin() {
-  return sessionStorage.getItem("isLoggedIn") === "true";
+  return Boolean(localStorage.getItem("access_token"));
 }
 
 function getPageFromUrl() {
@@ -60,19 +60,42 @@ function App() {
     window.location.hash = "/" + encodeURIComponent(page);
   }
 
-  function handleLogin() {
+    function handleLogin() {
     sessionStorage.setItem("isLoggedIn", "true");
     setActivePage("dashboard");
     setIsLoggedIn(true);
     window.location.hash = "/dashboard";
   }
 
-  function handleLogout() {
+  // Secure Logout: Calls Django Logout API and clears tokens
+  async function handleLogout() {
+    const token = localStorage.getItem("access_token");
+    const refreshToken = localStorage.getItem("refresh_token");
+
+    // Call Backend Logout API to blacklist refresh token
+    if (token && refreshToken) {
+      try {
+        await fetch("http://localhost:8000/api/accounts/logout/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+          body: JSON.stringify({ refresh: refreshToken }),
+        });
+      } catch (err) {
+        console.error("Backend logout error:", err);
+      }
+    }
+
+    // Clear all stored credentials
+    localStorage.clear();
     sessionStorage.removeItem("isLoggedIn");
     setIsLoggedIn(false);
     setActivePage("login");
     window.location.hash = "/login";
   }
+
 
   if (!isLoggedIn || activePage === "login") {
     return <Login onLogin={handleLogin} />;
