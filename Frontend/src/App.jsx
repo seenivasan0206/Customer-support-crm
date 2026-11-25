@@ -1,17 +1,10 @@
-<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
-=======
-import React, { useState } from "react";
-
->>>>>>> 257d0af38e81b47770e70753c6801bdf0e11ddb0
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-<<<<<<< HEAD
 import SupportRequests from "./pages/SupportRequests";
-=======
 import KnowledgeBase from "./pages/KnowledgeBase";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
@@ -19,15 +12,11 @@ import Customers from "./pages/CustomerManagement";
 import Agents from "./pages/Agents";
 import ConversationsAndLiveChats from "./pages/ConversationsAndLiveChats";
 
->>>>>>> 257d0af38e81b47770e70753c6801bdf0e11ddb0
 import "./App.css";
 
-
-<<<<<<< HEAD
 function isSavedLogin() {
   return sessionStorage.getItem("isLoggedIn") === "true";
 }
-
 
 function getPageFromUrl() {
   return decodeURIComponent(window.location.hash.replace("#/", ""));
@@ -39,7 +28,6 @@ function App() {
   const [activePage, setActivePage] = useState(() => {
     let page = getPageFromUrl();
 
-    
     if (page === "") {
       page = isSavedLogin() ? "dashboard" : "login";
       window.history.replaceState(null, "", "#/" + page);
@@ -47,7 +35,6 @@ function App() {
     return page;
   });
 
-  
   useEffect(() => {
     function handleUrlChange() {
       setActivePage(getPageFromUrl());
@@ -57,7 +44,6 @@ function App() {
     return () => window.removeEventListener("hashchange", handleUrlChange);
   }, []);
 
-  
   useEffect(() => {
     if (activePage === "login" && isLoggedIn) {
       sessionStorage.removeItem("isLoggedIn");
@@ -70,12 +56,10 @@ function App() {
     }
   }, [activePage, isLoggedIn]);
 
-  
   function changePage(page) {
     window.location.hash = "/" + encodeURIComponent(page);
   }
 
-  
   function handleLogin() {
     sessionStorage.setItem("isLoggedIn", "true");
     setActivePage("dashboard");
@@ -83,7 +67,6 @@ function App() {
     window.location.hash = "/dashboard";
   }
 
-  
   function handleLogout() {
     sessionStorage.removeItem("isLoggedIn");
     setIsLoggedIn(false);
@@ -91,22 +74,24 @@ function App() {
     window.location.hash = "/login";
   }
 
-  
   if (!isLoggedIn || activePage === "login") {
     return <Login onLogin={handleLogin} />;
   }
 
   const page = activePage === "" ? "dashboard" : activePage;
-  const pageLower = page.toLowerCase();
-=======
-  // Show Login page if user is not logged in
-  if (!isLoggedIn) {
-    return <Login onLogin={() => setIsLoggedIn(true)} />;
-  }
 
-  // Render the selected page
   const renderPage = () => {
-    switch (activePage.toLowerCase()) {
+    const pageLower = page.toLowerCase();
+
+    if (
+      pageLower.includes("support") ||
+      pageLower.includes("request") ||
+      pageLower.includes("ticket")
+    ) {
+      return <SupportRequests />;
+    }
+
+    switch (pageLower) {
       case "dashboard":
         return <Dashboard />;
 
@@ -132,36 +117,19 @@ function App() {
         return <h2>Page Not Found</h2>;
     }
   };
->>>>>>> 257d0af38e81b47770e70753c6801bdf0e11ddb0
 
   return (
     <div className="app-layout">
       <Sidebar
-<<<<<<< HEAD
         activePage={page}
         setActivePage={changePage}
         onLogout={handleLogout}
-=======
-        activePage={activePage}
-        setActivePage={setActivePage}
->>>>>>> 257d0af38e81b47770e70753c6801bdf0e11ddb0
       />
 
       <div className="main-section">
         <Header onLogout={handleLogout} />
 
-        <div className="page-content">
-<<<<<<< HEAD
-          {pageLower.includes("dashboard") && <Dashboard />}
-          {pageLower.includes("support") && <SupportRequests />}
-
-          {}
-          {!pageLower.includes("dashboard") &&
-            !pageLower.includes("support") && <h2>{page}</h2>}
-=======
-          {renderPage()}
->>>>>>> 257d0af38e81b47770e70753c6801bdf0e11ddb0
-        </div>
+        <div className="page-content">{renderPage()}</div>
       </div>
     </div>
   );
