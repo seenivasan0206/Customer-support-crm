@@ -22,14 +22,12 @@ class Ticket(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
 
-    # Customer relationship (ticket creator)
     customer = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='created_tickets'
     )
 
-    # Assigned Support Agent
     assigned_to = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -45,7 +43,6 @@ class Ticket(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
-        # Auto-generate a unique ticket ID on initial creation
         if not self.ticket_id:
             self.ticket_id = f"TCK-{uuid.uuid4().hex[:8].upper()}"
         super().save(*args, **kwargs)

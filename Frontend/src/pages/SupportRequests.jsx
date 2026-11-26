@@ -5,12 +5,12 @@ function SupportRequests() {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  
+  // Search & Filter state
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [showForm, setShowForm] = useState(false);
 
-  
+  // Form input state
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("Medium");
@@ -18,7 +18,7 @@ function SupportRequests() {
 
   const token = localStorage.getItem("access_token");
 
-  
+  // 1. Fetch tickets from Django Backend API
   async function fetchTickets() {
     setLoading(true);
     try {
@@ -53,12 +53,12 @@ function SupportRequests() {
     }
   }
 
-  
+  // Load tickets on component mount and when search/filter changes
   useEffect(() => {
     fetchTickets();
   }, [search, statusFilter]);
 
- 
+  // 2. Create New Ticket (POST /api/tickets/)
   async function handleAdd(e) {
     e.preventDefault();
     setErrorMessage("");
@@ -80,7 +80,7 @@ function SupportRequests() {
       const data = await response.json();
 
       if (response.ok) {
-        
+        // Reset form and reload tickets from database
         setSubject("");
         setDescription("");
         setPriority("Medium");
@@ -94,7 +94,7 @@ function SupportRequests() {
     }
   }
 
-  
+  // 3. Update Ticket Status (PATCH /api/tickets/:id/)
   async function handleStatusChange(id, newStatus) {
     try {
       const response = await fetch(`http://localhost:8000/api/tickets/${id}/`, {
@@ -109,7 +109,7 @@ function SupportRequests() {
       });
 
       if (response.ok) {
-        fetchTickets(); 
+        fetchTickets(); // Refresh tickets list
       } else {
         const errorData = await response.json();
         alert(errorData.detail || "Unable to update ticket status.");
@@ -119,7 +119,7 @@ function SupportRequests() {
     }
   }
 
-  
+  // 4. Delete Ticket (DELETE /api/tickets/:id/)
   async function handleDelete(id) {
     if (!window.confirm("Are you sure you want to delete this ticket?")) {
       return;

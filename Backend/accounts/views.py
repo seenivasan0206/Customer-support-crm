@@ -11,7 +11,6 @@ from .serializers import (
 )
 
 
-# 1. User Registration View (Public endpoint to register new user accounts)
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
@@ -29,13 +28,11 @@ class RegisterView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# 2. Login View (Returns JWT Access/Refresh tokens and user metadata)
 class LoginView(TokenObtainPairView):
     permission_classes = [AllowAny]
     serializer_class = CustomTokenObtainPairSerializer
 
 
-# 3. Profile View (Protected API - Validates JWT Bearer token and returns user details)
 class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -44,7 +41,6 @@ class ProfileView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-# 4. Logout View (Blacklists the provided refresh token)
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 

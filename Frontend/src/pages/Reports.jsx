@@ -28,13 +28,12 @@ import {
 import "./Reports.css";
 import { createSampleRecords, buildSampleReport, sampleOptions, dateKey } from "./reportSampleData";
 
-// All reporting requests stay in this page. The backend supplies the aggregates.
 const apiBase = (
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api" /// API 
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api"
 ).replace(/\/$/, "");
 const reportsUrl = (
-  import.meta.env.VITE_REPORTS_API_URL || `${apiBase}/reports` //  ---------------------- For reports
-).replace(/\/$/, ""); ////////////
+  import.meta.env.VITE_REPORTS_API_URL || `${apiBase}/reports`
+).replace(/\/$/, "");
 const initialFilters = {
   range: "30d",
   start_date: "",
@@ -122,6 +121,12 @@ function buildQuery(filters) {
 }
 
 async function reportRequest(path, options = {}) {
+  const token = localStorage.getItem("access_token");
+  const headers = {
+    ...(options.headers || {}),
+    ...(token ? { "Authorization": `Bearer ${token}` } : {})
+  };
+  options = { ...options, headers };
   let response;
   try {
     response = await fetch(`${reportsUrl}/${path}`, options);
@@ -462,7 +467,7 @@ function ReportChart({ chart, data, loading, sample }) {
 }
 
 export default function Reports() {
-  const [sample, setSample] = useState(true);
+  const [sample, setSample] = useState(false);
   return <ReportsContent key={String(sample)} sample={sample} onSourceChange={() => setSample(value => !value)} />;
 }
 
@@ -705,17 +710,7 @@ function ReportsContent({ sample, onSourceChange }) {
         </div>
       </header>
 
-      <div className="report-source">
-        <div>
-          <strong>{sample ? "Sample data · Frontend demo" : "Live reporting API"}</strong>
-          <p>{sample
-            ? `Fictional tickets from ${sampleRecords.at(-1).date} through ${dateKey(sampleToday)}. Filters use creation dates. Saving and scheduling are unavailable for sample data.`
-            : "Reports and filter choices come from the existing reporting service."}</p>
-        </div>
-        <button type="button" className="report-no-print" disabled={saving} onClick={onSourceChange}>
-          {sample ? "Use live reports" : "Use sample data"}
-        </button>
-      </div>
+
       <form className="report-filters report-no-print" onSubmit={applyFilters}>
         <div className="report-filter-heading">
           <SlidersHorizontal size={16} />

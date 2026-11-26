@@ -34,8 +34,6 @@ class MessageCreateSerializer(serializers.Serializer):
     )
 
     def validate(self, attrs):
-        if attrs["sender_type"] == "AGENT" and not attrs.get("sender_agent"):
-            raise serializers.ValidationError({"sender_agent": "Required for agent messages."})
         if attrs["sender_type"] == "CUSTOMER" and attrs.get("sender_agent"):
-            raise serializers.ValidationError({"sender_agent": "Do not provide an agent for customer messages."})
+            attrs["sender_agent"] = None
         return attrs

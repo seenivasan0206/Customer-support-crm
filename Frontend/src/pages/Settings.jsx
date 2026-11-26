@@ -7,7 +7,11 @@ import {
 } from "lucide-react";
 import "./Settings.css";
 
-const API_URL = "http://localhost:5000/api/settings";       // API
+const API_URL =
+  import.meta.env.VITE_SETTINGS_API_URL ||
+  (import.meta.env.VITE_API_BASE_URL
+    ? `${import.meta.env.VITE_API_BASE_URL}/settings`
+    : "http://localhost:8000/api/settings");
 
 const initialProfile = {
   name: "",
@@ -76,13 +80,16 @@ export default function Settings({ registerPageGuard }) {
     const controller = new AbortController();
 
     async function fetchSettings() {
+      const token = localStorage.getItem("access_token");
       try {
         setLoading(true);
 
         const response = await fetch(
-          `${API_URL}/profile`,                   // ----------------For profile
+          `${API_URL}/profile`,
           {
-            credentials: "include",
+            headers: {
+              ...(token ? { "Authorization": `Bearer ${token}` } : {})
+            },
             signal: controller.signal,
           }
         );
@@ -126,14 +133,19 @@ export default function Settings({ registerPageGuard }) {
   // Fetch role and integration information
   useEffect(() => {
     async function fetchAdditionalSettings() {
+      const token = localStorage.getItem("access_token");
       try {
         const [rolesResponse, integrationsResponse] =
           await Promise.all([
-            fetch(`${API_URL}/roles`, {                         // ---------------------- FOR Roles
-              credentials: "include",
+            fetch(`${API_URL}/roles`, {
+              headers: {
+                ...(token ? { "Authorization": `Bearer ${token}` } : {})
+              },
             }),
-            fetch(`${API_URL}/integrations`, {                 // ----------------------For integrations
-              credentials: "include",
+            fetch(`${API_URL}/integrations`, {
+              headers: {
+                ...(token ? { "Authorization": `Bearer ${token}` } : {})
+              },
             }),
           ]);
 
@@ -192,12 +204,13 @@ export default function Settings({ registerPageGuard }) {
     try {
       setSaving(true);
       setMessage("");
+      const token = localStorage.getItem("access_token");
 
-      const response = await fetch(`${API_URL}/profile`, {               // ----------------- Profile
+      const response = await fetch(`${API_URL}/profile`, {
         method: "PUT",
-        credentials: "include",
         headers: {
           "Content-Type": "application/json",
+          ...(token ? { "Authorization": `Bearer ${token}` } : {})
         },
         body: JSON.stringify(draft),
       });
@@ -229,7 +242,6 @@ export default function Settings({ registerPageGuard }) {
     }
   }
 
-  // Upload photo to backend
   async function choosePhoto(event) {
     const file = event.target.files?.[0];
     event.target.value = "";
@@ -248,7 +260,7 @@ export default function Settings({ registerPageGuard }) {
     formData.append("photo", file);
 
     try {
-      const response = await fetch(`${API_URL}/profile/photo`, {             // --------------------uplode the profile photo
+      const response = await fetch(`${API_URL}/profile/photo`, {
         method: "POST",
         credentials: "include",
         body: formData,
@@ -267,10 +279,9 @@ export default function Settings({ registerPageGuard }) {
     }
   }
 
-  // Remove photo from backend
   async function removePhoto() {
     try {
-      const response = await fetch(                      // ---------------- Delete Photo
+      const response = await fetch(
         `${API_URL}/profile/photo`,
         {
           method: "DELETE",
