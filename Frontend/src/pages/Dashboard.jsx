@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import React, { useState } from "react";
-=======
-import React, { useState, useEffect } from "react";
->>>>>>> c831d98fc837eff214248bda2845a8079fbb5ffe
 import {
   BarChart,
   Bar,
@@ -159,11 +155,11 @@ function getDate(daysAgo) {
 }
 
 function Dashboard() {
-<<<<<<< HEAD
   const [rangeDays, setRangeDays] = useState(30);
   const [status, setStatus] = useState("All");
   const [priority, setPriority] = useState("All");
 
+  // filter apply panna
   const filteredTickets = allTickets.filter((t) => {
     const matchRange = t.daysAgo < rangeDays;
     const matchStatus = status === "All" || t.status === status;
@@ -204,68 +200,6 @@ function Dashboard() {
     setStatus("All");
     setPriority("All");
   }
-=======
-  // State for dashboard metrics and live tickets
-  const [summary, setSummary] = useState({
-    total_tickets: 0,
-    open_tickets: 0,
-    resolved_tickets: 0,
-    pending_tickets: 0,
-  });
-  const [recentTickets, setRecentTickets] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  // Fetch real-time dashboard data from Django API on page load
-  useEffect(() => {
-    async function fetchDashboardData() {
-      const token = localStorage.getItem("access_token");
-
-      try {
-        const response = await fetch("http://localhost:8000/api/dashboard/overview/", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-          },
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          // Update state with real MySQL aggregated counts
-          setSummary(data.summary);
-          setRecentTickets(data.recent_requests || []);
-        } else {
-          console.error("Failed to load dashboard data:", data);
-        }
-      } catch (err) {
-        console.error("Network error while connecting to dashboard API:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchDashboardData();
-  }, []);
-
-  // Format statistics cards using live MySQL data
-  const stats = [
-    { title: "Total Tickets", count: summary.total_tickets, color: "#4f46e5" },
-    { title: "Open", count: summary.open_tickets, color: "#f59e0b" },
-    { title: "Resolved", count: summary.resolved_tickets, color: "#16a34a" },
-    { title: "Pending", count: summary.pending_tickets, color: "#dc2626" },
-  ];
-
-  const weeklyData = [
-    { day: "Mon", tickets: summary.open_tickets },
-    { day: "Tue", tickets: summary.pending_tickets },
-    { day: "Wed", tickets: summary.resolved_tickets },
-    { day: "Thu", tickets: summary.total_tickets },
-    { day: "Fri", tickets: summary.open_tickets },
-    { day: "Sat", tickets: 2 },
-    { day: "Sun", tickets: summary.total_tickets },
-  ];
->>>>>>> c831d98fc837eff214248bda2845a8079fbb5ffe
 
   return (
     <div className="dashboard-page">
@@ -274,7 +208,6 @@ function Dashboard() {
         Welcome back! Here is your support summary.
       </p>
 
-<<<<<<< HEAD
       <div className="dash-filters">
         <div className="dash-range">
           {ranges.map((r) => (
@@ -318,10 +251,6 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Stats cards */}
-=======
-      {/* Top Statistic Cards */}
->>>>>>> c831d98fc837eff214248bda2845a8079fbb5ffe
       <div className="stats-container">
         {stats.map((item) => (
           <div
@@ -330,18 +259,13 @@ function Dashboard() {
             style={{ borderLeftColor: item.color }}
           >
             <p>{item.title}</p>
-            <h3>{loading ? "..." : item.count}</h3>
+            <h3>{item.count}</h3>
           </div>
         ))}
       </div>
 
-      {/* Weekly Chart */}
       <div className="dash-box">
-<<<<<<< HEAD
         <h3>Tickets by Day</h3>
-=======
-        <h3>Tickets Summary Chart</h3>
->>>>>>> c831d98fc837eff214248bda2845a8079fbb5ffe
         <ResponsiveContainer width="100%" height={250}>
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgb(41, 62, 104)" />
@@ -361,21 +285,16 @@ function Dashboard() {
         </ResponsiveContainer>
       </div>
 
-      {/* Recent Support Requests Table */}
       <div className="dash-box">
-<<<<<<< HEAD
         <h3>Recent Tickets</h3>
         <p className="dash-count">
           Showing {shownTickets.length} of {filteredTickets.length} tickets
         </p>
 
-=======
-        <h3>Recent Support Tickets</h3>
->>>>>>> c831d98fc837eff214248bda2845a8079fbb5ffe
         <table>
           <thead>
             <tr>
-              <th>Ticket ID</th>
+              <th>ID</th>
               <th>Customer</th>
               <th>Subject</th>
               <th>Date</th>
@@ -384,7 +303,6 @@ function Dashboard() {
             </tr>
           </thead>
           <tbody>
-<<<<<<< HEAD
             {shownTickets.map((ticket) => (
               <tr key={ticket.id}>
                 <td>{ticket.id}</td>
@@ -400,29 +318,10 @@ function Dashboard() {
                   <span className={"dash-badge " + ticket.status.toLowerCase()}>
                     {ticket.status}
                   </span>
-=======
-            {recentTickets.length === 0 ? (
-              <tr>
-                <td colSpan="5" style={{ textAlign: "center", padding: "16px" }}>
-                  {loading ? "Loading tickets..." : "No support tickets found in database."}
->>>>>>> c831d98fc837eff214248bda2845a8079fbb5ffe
                 </td>
+                <td>{ticket.priority}</td>
               </tr>
-            ) : (
-              recentTickets.map((ticket) => (
-                <tr key={ticket.id}>
-                  <td>{ticket.ticket_id}</td>
-                  <td>{ticket.customer?.username || "N/A"}</td>
-                  <td>{ticket.title}</td>
-                  <td>
-                    <span className={"dash-badge " + ticket.status?.toLowerCase()}>
-                      {ticket.status}
-                    </span>
-                  </td>
-                  <td>{ticket.priority}</td>
-                </tr>
-              ))
-            )}
+            ))}
           </tbody>
         </table>
 
