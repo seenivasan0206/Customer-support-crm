@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 
@@ -16,41 +17,59 @@ import HelpAndSupport from "./pages/HelpAndSupport";
 import "./App.css";
 
 function isSavedLogin() {
-  return Boolean(localStorage.getItem("access_token"));
+  return (
+    Boolean(localStorage.getItem("access_token")) &&
+    sessionStorage.getItem("authenticatedSession") === "true"
+  );
 }
 
-function getPageFromUrl() {
-  return decodeURIComponent(window.location.hash.replace("#/", ""));
+function getInitialPage() {
+  const loggedIn = isSavedLogin();
+
+  if (!loggedIn) {
+    window.history.replaceState(null, "", "#/login");
+    return "login";
+  }
+
+  const navigation = performance.getEntriesByType("navigation")[0];
+
+  if (navigation?.type === "reload") {
+    window.history.replaceState(null, "", "#/dashboard");
+    return "dashboard";
+  }
+
+  const currentPage = decodeURIComponent(
+    window.location.hash.replace("#/", ""),
+  );
+
+  if (!currentPage || currentPage === "login") {
+    window.history.replaceState(null, "", "#/dashboard");
+    return "dashboard";
+  }
+
+  return currentPage;
 }
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(isSavedLogin());
+  const [isLoggedIn, setIsLoggedIn] = useState(() => isSavedLogin());
 
-  const [activePage, setActivePage] = useState(() => {
-    let page = getPageFromUrl();
-
-    if (page === "") {
-      page = isSavedLogin() ? "dashboard" : "login";
-      window.history.replaceState(null, "", "#/" + page);
-    }
-    return page;
-  });
+  const [activePage, setActivePage] = useState(() => getInitialPage());
 
   useEffect(() => {
     function handleUrlChange() {
-      setActivePage(getPageFromUrl());
+      const page = decodeURIComponent(window.location.hash.replace("#/", ""));
+
+      setActivePage(page || "dashboard");
     }
 
     window.addEventListener("hashchange", handleUrlChange);
-    return () => window.removeEventListener("hashchange", handleUrlChange);
+
+    return () => {
+      window.removeEventListener("hashchange", handleUrlChange);
+    };
   }, []);
 
   useEffect(() => {
-    if (activePage === "login" && isLoggedIn) {
-      sessionStorage.removeItem("isLoggedIn");
-      setIsLoggedIn(false);
-    }
-
     if (!isLoggedIn && activePage !== "login") {
       window.history.replaceState(null, "", "#/login");
       setActivePage("login");
@@ -61,10 +80,12 @@ function App() {
     window.location.hash = "/" + encodeURIComponent(page);
   }
 
-    function handleLogin() {
-    sessionStorage.setItem("isLoggedIn", "true");
-    setActivePage("dashboard");
+  function handleLogin() {
+    sessionStorage.setItem("authenticatedSession", "true");
+
     setIsLoggedIn(true);
+    setActivePage("dashboard");
+
     window.location.hash = "/dashboard";
   }
 
@@ -78,28 +99,35 @@ function App() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ refresh: refreshToken }),
+          body: JSON.stringify({
+            refresh: refreshToken,
+          }),
         });
       } catch (err) {
         console.error("Backend logout error:", err);
       }
     }
 
-    localStorage.clear();
-    sessionStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("user_role");
+    localStorage.removeItem("username");
+
+    sessionStorage.removeItem("authenticatedSession");
+
     setIsLoggedIn(false);
     setActivePage("login");
+
     window.location.hash = "/login";
   }
-
 
   if (!isLoggedIn || activePage === "login") {
     return <Login onLogin={handleLogin} />;
   }
 
-  const page = activePage === "" ? "dashboard" : activePage;
+  const page = activePage || "dashboard";
 
   const renderPage = () => {
     const pageLower = page.toLowerCase();
@@ -138,11 +166,8 @@ function App() {
       case "conversations":
         return <ConversationsAndLiveChats />;
 
-      case "help":
-        return <HelpAndSupport onNavigate={changePage} />;
-
       default:
-        return <h2>Page Not Found</h2>;
+        return <Dashboard />;
     }
   };
 

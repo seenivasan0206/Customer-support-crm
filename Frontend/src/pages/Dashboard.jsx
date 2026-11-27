@@ -7,6 +7,13 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+  AreaChart,
+  Area,
+  LabelList,
 } from "recharts";
 import "./Dashboard.css";
 
@@ -19,8 +26,75 @@ const ranges = [
 
 const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
+const tooltipStyle = {
+  backgroundColor: "rgb(19, 35, 73)",
+  border: "1px solid rgb(41, 62, 104)",
+  color: "white",
+};
+
+function renderPieLabel({ cx, cy, midAngle, innerRadius, outerRadius, value }) {
+  const RAD = Math.PI / 180;
+  const radius = innerRadius + (outerRadius - innerRadius) / 2;
+  const x = cx + radius * Math.cos(-midAngle * RAD);
+  const y = cy + radius * Math.sin(-midAngle * RAD);
+
+  return (
+    <text
+      x={x}
+      y={y}
+      fill="white"
+      textAnchor="middle"
+      dominantBaseline="central"
+      fontSize={14}
+      fontWeight="bold"
+    >
+      {value}
+    </text>
+  );
+}
+
+function PieCard({ title, data, innerRadius }) {
+  return (
+    <div className="dash-box">
+      <h3>{title}</h3>
+
+      {data.length === 0 ? (
+        <p className="dash-empty">No data</p>
+      ) : (
+        <ResponsiveContainer width="100%" height={260}>
+          <PieChart>
+            <Pie
+              data={data}
+              dataKey="value"
+              nameKey="name"
+              innerRadius={innerRadius}
+              outerRadius={95}
+              paddingAngle={data.length > 1 ? 3 : 0}
+              labelLine={false}
+              label={renderPieLabel}
+            >
+              {data.map((item) => (
+                <Cell key={item.name} fill={item.color} stroke="none" />
+              ))}
+            </Pie>
+            <Tooltip
+              contentStyle={tooltipStyle}
+              itemStyle={{ color: "white" }}
+            />
+            <Legend
+              formatter={(value) => (
+                <span style={{ color: "#dce5f5" }}>{value}</span>
+              )}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      )}
+    </div>
+  );
+}
+
 function Dashboard() {
-  const [rangeDays, setRangeDays] = useState(30);
+  const [rangeDays, setRangeDays] = useState(1);
   const [status, setStatus] = useState("All");
   const [priority, setPriority] = useState("All");
 
@@ -124,7 +198,7 @@ function Dashboard() {
   });
 
   const resetFilters = () => {
-    setRangeDays(9999);
+    setRangeDays(1);
     setStatus("All");
     setPriority("All");
   };
@@ -175,6 +249,56 @@ function Dashboard() {
     const count = filteredTickets.filter((t) => t.daysAgo === dayOffset).length;
     return { day, tickets: count };
   });
+
+  const statusData = [
+    { name: "Open", color: "#f59e0b" },
+    { name: "Pending", color: "#dc2626" },
+    { name: "Resolved", color: "#16a34a" },
+  ]
+    .map((s) => ({
+      ...s,
+      value: filteredTickets.filter(
+        (t) => t.status.toLowerCase() === s.name.toLowerCase(),
+      ).length,
+    }))
+    .filter((s) => s.value > 0);
+
+  const priorityData = [
+    { name: "High", color: "#f43f5e" },
+    { name: "Medium", color: "#3e52d4" },
+    { name: "Low", color: "#14b8a6" },
+  ]
+    .map((p) => ({
+      ...p,
+      value: filteredTickets.filter(
+        (t) => t.priority.toLowerCase() === p.name.toLowerCase(),
+      ).length,
+    }))
+    .filter((p) => p.value > 0);
+
+  const trendDays = Math.max(7, Math.min(rangeDays, 14));
+  const trendData = [];
+  for (let i = trendDays - 1; i >= 0; i--) {
+    const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+    trendData.push({
+      label: date.toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+      }),
+      tickets: filteredTickets.filter((t) => t.daysAgo === i).length,
+    });
+  }
+
+  const customerCounts = {};
+  filteredTickets.forEach((t) => {
+    if (!t.customer || t.customer === "Support User") return;
+    customerCounts[t.customer] = (customerCounts[t.customer] || 0) + 1;
+  });
+
+  const topCustomers = Object.keys(customerCounts)
+    .map((name) => ({ name: name, tickets: customerCounts[name] }))
+    .sort((a, b) => b.tickets - a.tickets)
+    .slice(0, 5);
 
   return (
     <div className="dashboard-page">
@@ -227,7 +351,6 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Top Statistic Cards */}
       <div className="stats-container">
         {stats.map((item) => (
           <div
@@ -266,6 +389,98 @@ function Dashboard() {
         </ResponsiveContainer>
       </div>
 
+      <div className="dash-charts-row">
+        <PieCard title="Tickets by Status" data={statusData} innerRadius={60} />
+        <PieCard
+          title="Tickets by Priority"
+          data={priorityData}
+          innerRadius={0}
+        />
+      </div>
+
+      <div className="dash-charts-row">
+        <div className="dash-box">
+          <h3>Tickets Trend</h3>
+
+          {filteredTickets.length === 0 ? (
+            <p className="dash-empty">No data</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={260}>
+              <AreaChart data={trendData}>
+                <defs>
+                  <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop
+                      offset="5%"
+                      stopColor="rgb(62, 82, 212)"
+                      stopOpacity={0.6}
+                    />
+                    <stop
+                      offset="95%"
+                      stopColor="rgb(62, 82, 212)"
+                      stopOpacity={0.05}
+                    />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="rgb(41, 62, 104)"
+                />
+                <XAxis dataKey="label" stroke="#b8c5dc" />
+                <YAxis stroke="#b8c5dc" allowDecimals={false} />
+                <Tooltip
+                  contentStyle={tooltipStyle}
+                  labelStyle={{ color: "white" }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="tickets"
+                  stroke="#8fa2ff"
+                  strokeWidth={2}
+                  fill="url(#trendFill)"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+
+        <div className="dash-box">
+          <h3>Top Customers</h3>
+
+          {topCustomers.length === 0 ? (
+            <p className="dash-empty">No data</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart
+                data={topCustomers}
+                layout="vertical"
+                margin={{ left: 10, right: 30 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="rgb(41, 62, 104)"
+                  horizontal={false}
+                />
+                <XAxis type="number" stroke="#b8c5dc" allowDecimals={false} />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  stroke="#b8c5dc"
+                  width={110}
+                />
+                <Tooltip
+                  contentStyle={tooltipStyle}
+                  labelStyle={{ color: "white" }}
+                  cursor={{ fill: "rgba(255, 255, 255, 0.05)" }}
+                />
+                <Bar dataKey="tickets" fill="#14b8a6" radius={[0, 6, 6, 0]}>
+                  <LabelList dataKey="tickets" position="right" fill="white" />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+      </div>
+
       <div className="dash-box">
         <h3>Recent Support Tickets</h3>
         <table>
@@ -289,9 +504,7 @@ function Dashboard() {
                     padding: "24px",
                     color: "#8b93a7",
                   }}
-                >
-                  Loading tickets from database...
-                </td>
+                ></td>
               </tr>
             ) : filteredTickets.length === 0 ? (
               <tr>
@@ -302,10 +515,7 @@ function Dashboard() {
                     padding: "24px",
                     color: "#8b93a7",
                   }}
-                >
-                  No support tickets found in database. Create one in Support
-                  Requests.
-                </td>
+                ></td>
               </tr>
             ) : (
               filteredTickets.slice(0, 8).map((ticket) => (
