@@ -148,8 +148,7 @@ function Agents() {
   return (
     <div className="agents-page">
       <div className="agents-heading">
-        <p>AGENT MANAGEMENT</p>
-        <h1>Agents</h1>
+        <h1>Agent Management</h1>
         <p>Manage your support team and monitor agent availability directly in the database.</p>
       </div>
 
