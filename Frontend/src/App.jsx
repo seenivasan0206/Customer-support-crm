@@ -26,7 +26,7 @@ function getPageFromUrl() {
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(isSavedLogin());
 
-  const [activePage, setActivePage] = useState(() => {
+  const [activePage, setActivePage] = useState(() => {  
     let page = getPageFromUrl();
 
     if (page === "") {

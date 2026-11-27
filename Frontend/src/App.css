@@ -319,9 +319,10 @@
 .page-content {
   flex: 1;
   min-width: 0;
-  padding: 25px;
+  /* padding: 5px; */
   background-color: rgb(19, 35, 73);
   min-height: 100vh;
+  /* margin-top: 0; */
 }
 
 

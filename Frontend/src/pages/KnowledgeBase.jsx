@@ -878,7 +878,7 @@ function KnowledgeBase() {
   return (
     <div className="knowledge">
       <header className="kb-heading">
-        <span className="article-writer__eyebrow">SUPPORT LIBRARY</span>
+        {/* <span className="article-writer__eyebrow">SUPPORT LIBRARY</span> */}
         <h2 className="kb-title">Knowledge Base</h2>
         <p>Create helpful articles and organize your team's knowledge by topic.</p>
       </header>
