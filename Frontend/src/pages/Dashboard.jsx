@@ -10,6 +10,137 @@ import {
 } from "recharts";
 import "./Dashboard.css";
 
+const allTickets = [
+  {
+    id: "#1001",
+    customer: "Ravi Kumar",
+    subject: "Unable to login",
+    status: "Open",
+    priority: "High",
+    daysAgo: 0,
+  },
+  {
+    id: "#1002",
+    customer: "Priya Sharma",
+    subject: "Payment not received",
+    status: "Pending",
+    priority: "Medium",
+    daysAgo: 0,
+  },
+  {
+    id: "#1003",
+    customer: "Arun Raj",
+    subject: "Change email address",
+    status: "Resolved",
+    priority: "Low",
+    daysAgo: 1,
+  },
+  {
+    id: "#1004",
+    customer: "Divya Nair",
+    subject: "App is crashing",
+    status: "Open",
+    priority: "High",
+    daysAgo: 1,
+  },
+  {
+    id: "#1005",
+    customer: "Karthik S",
+    subject: "Refund request",
+    status: "Resolved",
+    priority: "Medium",
+    daysAgo: 2,
+  },
+  {
+    id: "#1006",
+    customer: "Meena R",
+    subject: "Invoice not generated",
+    status: "Pending",
+    priority: "High",
+    daysAgo: 3,
+  },
+  {
+    id: "#1007",
+    customer: "Suresh B",
+    subject: "Password reset not working",
+    status: "Open",
+    priority: "Medium",
+    daysAgo: 3,
+  },
+  {
+    id: "#1008",
+    customer: "Anitha K",
+    subject: "Delivery delay",
+    status: "Resolved",
+    priority: "Low",
+    daysAgo: 4,
+  },
+  {
+    id: "#1009",
+    customer: "Vignesh M",
+    subject: "Wrong product received",
+    status: "Open",
+    priority: "High",
+    daysAgo: 5,
+  },
+  {
+    id: "#1010",
+    customer: "Lakshmi P",
+    subject: "Account locked",
+    status: "Resolved",
+    priority: "High",
+    daysAgo: 6,
+  },
+  {
+    id: "#1011",
+    customer: "Manoj T",
+    subject: "Update billing address",
+    status: "Pending",
+    priority: "Low",
+    daysAgo: 9,
+  },
+  {
+    id: "#1012",
+    customer: "Deepa S",
+    subject: "Unable to download report",
+    status: "Resolved",
+    priority: "Medium",
+    daysAgo: 12,
+  },
+  {
+    id: "#1013",
+    customer: "Naveen Kumar",
+    subject: "Slow performance",
+    status: "Open",
+    priority: "Medium",
+    daysAgo: 15,
+  },
+  {
+    id: "#1014",
+    customer: "Sathish Kumar",
+    subject: "Feature request",
+    status: "Pending",
+    priority: "Low",
+    daysAgo: 20,
+  },
+  {
+    id: "#1015",
+    customer: "Harini V",
+    subject: "Duplicate charge",
+    status: "Resolved",
+    priority: "High",
+    daysAgo: 25,
+  },
+  {
+    id: "#1016",
+    customer: "Gokul N",
+    subject: "Email not received",
+    status: "Open",
+    priority: "Low",
+    daysAgo: 28,
+  },
+];
+
 const ranges = [
   { label: "Today", days: 1 },
   { label: "Last 7 Days", days: 7 },
@@ -19,13 +150,65 @@ const ranges = [
 
 const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
+function getDate(daysAgo) {
+  return new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000);
+}
+
 function Dashboard() {
+<<<<<<< HEAD
   const [rangeDays, setRangeDays] = useState(30);
   const [status, setStatus] = useState("All");
   const [priority, setPriority] = useState("All");
 
-  const [dbTickets, setDbTickets] = useState([]);
-  const [dbSummary, setDbSummary] = useState(null);
+  const filteredTickets = allTickets.filter((t) => {
+    const matchRange = t.daysAgo < rangeDays;
+    const matchStatus = status === "All" || t.status === status;
+    const matchPriority = priority === "All" || t.priority === priority;
+    return matchRange && matchStatus && matchPriority;
+  });
+
+  const stats = [
+    { title: "Total Tickets", count: filteredTickets.length, color: "#4f46e5" },
+    {
+      title: "Open",
+      count: filteredTickets.filter((t) => t.status === "Open").length,
+      color: "#f59e0b",
+    },
+    {
+      title: "Resolved",
+      count: filteredTickets.filter((t) => t.status === "Resolved").length,
+      color: "#16a34a",
+    },
+    {
+      title: "Pending",
+      count: filteredTickets.filter((t) => t.status === "Pending").length,
+      color: "#dc2626",
+    },
+  ];
+
+  const chartData = weekDays.map((day) => ({ day: day, tickets: 0 }));
+  filteredTickets.forEach((t) => {
+    const jsDay = getDate(t.daysAgo).getDay(); // 0 = Sunday
+    const index = jsDay === 0 ? 6 : jsDay - 1;
+    chartData[index].tickets += 1;
+  });
+
+  const shownTickets = filteredTickets.slice(0, 6);
+
+  function resetFilters() {
+    setRangeDays(30);
+    setStatus("All");
+    setPriority("All");
+  }
+=======
+  // State for dashboard metrics and live tickets
+  const [summary, setSummary] = useState({
+    total_tickets: 0,
+    open_tickets: 0,
+    resolved_tickets: 0,
+    pending_tickets: 0,
+  });
+  const [recentTickets, setRecentTickets] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -33,71 +216,22 @@ function Dashboard() {
       const token = localStorage.getItem("access_token");
 
       try {
-        const [overviewRes, ticketsRes] = await Promise.all([
-          fetch("http://localhost:8000/api/dashboard/overview/", {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              ...(token ? { "Authorization": `Bearer ${token}` } : {}),
-            },
-          }),
-          fetch("http://localhost:8000/api/tickets/", {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              ...(token ? { "Authorization": `Bearer ${token}` } : {}),
-            },
-          }),
-        ]);
-
-        let overviewData = null;
-        if (overviewRes.ok) {
-          overviewData = await overviewRes.json();
-          setDbSummary(overviewData.summary);
-        }
-
-        let rawTicketsList = [];
-        if (ticketsRes.ok) {
-          const ticketsData = await ticketsRes.json();
-          rawTicketsList = Array.isArray(ticketsData)
-            ? ticketsData
-            : ticketsData.results || [];
-        } else if (overviewData && overviewData.recent_requests) {
-          rawTicketsList = overviewData.recent_requests;
-        }
-
-        const normalized = rawTicketsList.map((t) => {
-          const created = t.created_at ? new Date(t.created_at) : new Date();
-          const daysAgo = Math.max(
-            0,
-            Math.floor((Date.now() - created.getTime()) / (24 * 60 * 60 * 1000))
-          );
-          const statusFormatted = t.status
-            ? t.status.charAt(0).toUpperCase() + t.status.slice(1).toLowerCase()
-            : "Open";
-          const priorityFormatted = t.priority
-            ? t.priority.charAt(0).toUpperCase() + t.priority.slice(1).toLowerCase()
-            : "Medium";
-          const customerName =
-            t.customer?.username ||
-            (t.customer?.first_name
-              ? `${t.customer.first_name} ${t.customer.last_name || ""}`.trim()
-              : null) ||
-            t.customer_name ||
-            (typeof t.customer === "string" ? t.customer : "Support User");
-
-          return {
-            id: t.ticket_id || `#${t.id}`,
-            customer: customerName,
-            subject: t.title,
-            status: statusFormatted,
-            priority: priorityFormatted,
-            daysAgo: daysAgo,
-            created_at: created,
-          };
+        const response = await fetch("http://localhost:8000/api/dashboard/overview/", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
         });
 
-        setDbTickets(normalized);
+        const data = await response.json();
+
+        if (response.ok) {
+          setDbSummary(data.summary);
+          setRecentTickets(data.recent_requests || []);
+        } else {
+          console.error("Failed to load dashboard data:", data);
+        }
       } catch (err) {
         console.error("Network error while connecting to dashboard API:", err);
       } finally {
@@ -108,7 +242,7 @@ function Dashboard() {
     fetchDashboardData();
   }, []);
 
-  const filteredTickets = dbTickets.filter((t) => {
+  const filteredTickets = allTickets.filter((t) => {
     if (t.daysAgo > rangeDays) return false;
     if (status !== "All" && t.status.toLowerCase() !== status.toLowerCase()) return false;
     if (priority !== "All" && t.priority.toLowerCase() !== priority.toLowerCase()) return false;
@@ -121,58 +255,53 @@ function Dashboard() {
     setPriority("All");
   };
 
-  const isFiltered = status !== "All" || priority !== "All" || rangeDays !== 9999;
-
   const stats = [
     {
       title: "Total Tickets",
-      count: isFiltered
-        ? filteredTickets.length
-        : dbSummary?.total_tickets ?? dbTickets.length,
+      count: filteredTickets.length,
       color: "#4f46e5",
     },
     {
       title: "Open",
-      count: isFiltered
-        ? filteredTickets.filter((t) => t.status.toLowerCase() === "open").length
-        : dbSummary?.open_tickets ?? dbTickets.filter((t) => t.status.toLowerCase() === "open").length,
+      count: filteredTickets.filter((t) => t.status === "Open").length,
       color: "#f59e0b",
     },
     {
       title: "Resolved",
-      count: isFiltered
-        ? filteredTickets.filter((t) => t.status.toLowerCase() === "resolved").length
-        : dbSummary?.resolved_tickets ?? dbTickets.filter((t) => t.status.toLowerCase() === "resolved").length,
+      count: filteredTickets.filter((t) => t.status === "Resolved").length,
       color: "#16a34a",
     },
     {
       title: "Pending",
-      count: isFiltered
-        ? filteredTickets.filter((t) => t.status.toLowerCase() === "pending").length
-        : dbSummary?.pending_tickets ?? dbTickets.filter((t) => t.status.toLowerCase() === "pending").length,
+      count: filteredTickets.filter((t) => t.status === "Pending").length,
       color: "#dc2626",
     },
   ];
 
-  const chartData = weekDays.map((day, idx) => {
-    const dayOffset = (new Date().getDay() - 1 - idx + 7) % 7;
-    const count = filteredTickets.filter((t) => t.daysAgo === dayOffset).length;
-    return { day, tickets: count };
-  });
+  const weeklyData = [
+    { day: "Mon", tickets: summary.open_tickets },
+    { day: "Tue", tickets: summary.pending_tickets },
+    { day: "Wed", tickets: summary.resolved_tickets },
+    { day: "Thu", tickets: summary.total_tickets },
+    { day: "Fri", tickets: summary.open_tickets },
+    { day: "Sat", tickets: 2 },
+    { day: "Sun", tickets: summary.total_tickets },
+  ];
+>>>>>>> c831d98fc837eff214248bda2845a8079fbb5ffe
 
   return (
     <div className="dashboard-page">
       <h2>Dashboard Overview</h2>
       <p className="dashboard-sub">
-        Welcome back! Here is your real-time support summary from the database.
+        Welcome back! Here is your support summary.
       </p>
 
+<<<<<<< HEAD
       <div className="dash-filters">
         <div className="dash-range">
           {ranges.map((r) => (
             <button
               key={r.label}
-              type="button"
               className={rangeDays === r.days ? "active" : ""}
               onClick={() => setRangeDays(r.days)}
             >
@@ -205,13 +334,16 @@ function Dashboard() {
             </select>
           </label>
 
-          <button type="button" className="dash-reset" onClick={resetFilters}>
+          <button className="dash-reset" onClick={resetFilters}>
             Reset
           </button>
         </div>
       </div>
 
+      {/* Stats cards */}
+=======
       {/* Top Statistic Cards */}
+>>>>>>> c831d98fc837eff214248bda2845a8079fbb5ffe
       <div className="stats-container">
         {stats.map((item) => (
           <div
@@ -220,13 +352,17 @@ function Dashboard() {
             style={{ borderLeftColor: item.color }}
           >
             <p>{item.title}</p>
-            <h3>{loading && !dbSummary && dbTickets.length === 0 ? "..." : item.count}</h3>
+            <h3>{item.count}</h3>
           </div>
         ))}
       </div>
 
       <div className="dash-box">
+<<<<<<< HEAD
+        <h3>Tickets by Day</h3>
+=======
         <h3>Tickets Summary Chart</h3>
+>>>>>>> c831d98fc837eff214248bda2845a8079fbb5ffe
         <ResponsiveContainer width="100%" height={250}>
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgb(41, 62, 104)" />
@@ -260,39 +396,32 @@ function Dashboard() {
             </tr>
           </thead>
           <tbody>
-            {loading && dbTickets.length === 0 ? (
-              <tr>
-                <td colSpan="6" style={{ textAlign: "center", padding: "24px", color: "#8b93a7" }}>
-                  Loading tickets from database...
+<<<<<<< HEAD
+            {shownTickets.map((ticket) => (
+              <tr key={ticket.id}>
+                <td>{ticket.id}</td>
+                <td>{ticket.customer}</td>
+                <td>{ticket.subject}</td>
+                <td>
+                  {getDate(ticket.daysAgo).toLocaleDateString("en-IN", {
+                    day: "2-digit",
+                    month: "short",
+                  })}
                 </td>
-              </tr>
-            ) : filteredTickets.length === 0 ? (
+                <td>
+                  <span className={"dash-badge " + ticket.status.toLowerCase()}>
+                    {ticket.status}
+                  </span>
+=======
+            {recentTickets.length === 0 ? (
               <tr>
-                <td colSpan="6" style={{ textAlign: "center", padding: "24px", color: "#8b93a7" }}>
-                  No support tickets found in database. Create one in Support Requests.
+                <td colSpan="5" style={{ textAlign: "center", padding: "16px" }}>
+                  {loading ? "Loading tickets..." : "No support tickets found in database."}
+>>>>>>> c831d98fc837eff214248bda2845a8079fbb5ffe
                 </td>
+                <td>{ticket.priority}</td>
               </tr>
-            ) : (
-              filteredTickets.slice(0, 8).map((ticket) => (
-                <tr key={ticket.id}>
-                  <td>{ticket.id}</td>
-                  <td>{ticket.customer}</td>
-                  <td>{ticket.subject}</td>
-                  <td>
-                    {new Date(ticket.created_at).toLocaleDateString("en-IN", {
-                      day: "2-digit",
-                      month: "short",
-                    })}
-                  </td>
-                  <td>
-                    <span className={"dash-badge " + ticket.status.toLowerCase()}>
-                      {ticket.status}
-                    </span>
-                  </td>
-                  <td>{ticket.priority}</td>
-                </tr>
-              ))
-            )}
+            ))}
           </tbody>
         </table>
       </div>
