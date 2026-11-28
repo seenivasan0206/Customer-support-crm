@@ -4,6 +4,8 @@ import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 
 import Login from "./pages/Login";
+import Register from "./pages/Register";
+
 import Dashboard from "./pages/Dashboard";
 import SupportRequests from "./pages/SupportRequests";
 import KnowledgeBase from "./pages/KnowledgeBase";
@@ -24,6 +26,12 @@ function isSavedLogin() {
 }
 
 function getInitialPage() {
+  const page = decodeURIComponent(window.location.hash.replace("#/", ""));
+
+  if (page === "login" || page === "register") {
+    return page;
+  }
+
   if (!isSavedLogin()) {
     window.history.replaceState(null, "", "#/login");
     return "login";
@@ -32,14 +40,7 @@ function getInitialPage() {
   const navigation = performance.getEntriesByType("navigation")[0];
   const isRefresh = navigation?.type === "reload";
 
-  if (isRefresh) {
-    window.history.replaceState(null, "", "#/dashboard");
-    return "dashboard";
-  }
-
-  const page = decodeURIComponent(window.location.hash.replace("#/", ""));
-
-  if (!page || page === "login") {
+  if (isRefresh || !page) {
     window.history.replaceState(null, "", "#/dashboard");
     return "dashboard";
   }
@@ -49,12 +50,17 @@ function getInitialPage() {
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => isSavedLogin());
-
   const [activePage, setActivePage] = useState(() => getInitialPage());
 
   useEffect(() => {
     function handleUrlChange() {
       const page = decodeURIComponent(window.location.hash.replace("#/", ""));
+
+      if (!isSavedLogin() && !["register", "login"].includes(page)) {
+        window.history.replaceState(null, "", "#/login");
+        setActivePage("login");
+        return;
+      }
 
       setActivePage(page || "dashboard");
     }
@@ -67,7 +73,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!isLoggedIn && activePage !== "login") {
+    if (!isLoggedIn && !["login", "register"].includes(activePage)) {
       window.history.replaceState(null, "", "#/login");
       setActivePage("login");
     }
@@ -79,10 +85,8 @@ function App() {
 
   function handleLogin() {
     sessionStorage.setItem("authenticatedSession", "true");
-
     setIsLoggedIn(true);
     setActivePage("dashboard");
-
     window.location.hash = "/dashboard";
   }
 
@@ -98,9 +102,7 @@ function App() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            refresh: refreshToken,
-          }),
+          body: JSON.stringify({ refresh: refreshToken }),
         });
       } catch (err) {
         console.error("Backend logout error:", err);
@@ -116,12 +118,17 @@ function App() {
 
     setIsLoggedIn(false);
     setActivePage("login");
-
     window.location.hash = "/login";
   }
 
+  
+  if (activePage === "register") {
+    return <Register onNavigate={changePage} />;
+  }
+
+  
   if (!isLoggedIn || activePage === "login") {
-    return <Login onLogin={handleLogin} />;
+    return <Login onLogin={handleLogin} onNavigate={changePage} />;
   }
 
   const page = activePage || "dashboard";
@@ -144,25 +151,18 @@ function App() {
     switch (pageLower) {
       case "dashboard":
         return <Dashboard />;
-
       case "knowledge":
         return <KnowledgeBase />;
-
       case "reports":
         return <Reports />;
-
       case "settings":
         return <Settings />;
-
       case "agents":
         return <Agents />;
-
       case "customers":
         return <Customers />;
-
       case "conversations":
         return <ConversationsAndLiveChats />;
-
       default:
         return <Dashboard />;
     }

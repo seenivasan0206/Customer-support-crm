@@ -233,3 +233,8 @@
     display: none;
   }
 }
+.required {
+  color: #ff6b6b;
+  font-weight: bold;
+  margin-left: 3px;
+}

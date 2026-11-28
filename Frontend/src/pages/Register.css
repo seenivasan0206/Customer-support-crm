@@ -1,0 +1,160 @@
+.register-right {
+  padding: 30px 20px;
+}
+
+.register-card {
+  max-width: 480px;
+  padding: 30px 40px;
+  margin: 20px 0;
+}
+
+.register-card .input-box input,
+.register-card .input-box select {
+  width: 100%;
+  padding: 14px 15px;
+  border: 1px solid rgb(41, 62, 104);
+  border-radius: 10px;
+  background-color: rgb(40, 62, 105);
+  color: white;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.register-card .input-box input::placeholder {
+  color: #c0cce0;
+}
+
+.register-card .input-box input:focus,
+.register-card .input-box select:focus {
+  outline: none;
+  border-color: rgb(62, 82, 212);
+  box-shadow: 0 0 0 3px rgba(62, 82, 212, 0.3);
+}
+
+.register-card .input-box select option {
+  background-color: rgb(30, 49, 88);
+  color: white;
+}
+
+.register-logo-icon {
+  font-size: 38px;
+  line-height: 1;
+  font-weight: 300;
+}
+
+.register-card .eye-btn {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.password-hint {
+  color: #b8c5dc;
+  font-size: 12px;
+  margin-top: -13px;
+  margin-bottom: 18px;
+}
+
+.register-success {
+  background-color: rgba(22, 163, 74, 0.15);
+  border: 1px solid #16a34a;
+  color: #86efac;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  font-size: 14px;
+}
+
+.register-card .login-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.register-link {
+  color: #b8c5dc;
+  text-align: center;
+  font-size: 14px;
+  margin-top: 22px;
+  margin-bottom: 0;
+}
+
+.register-link button {
+  background: none;
+  border: none;
+  color: #8fa2ff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.register-link button:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .register-card {
+    padding: 25px 22px;
+  }
+
+  .register-right {
+    padding: 15px;
+  }
+}
+
+
+.register-card {
+  max-width: 400px;
+  padding: 14px 25px;
+  margin: 5px 0;
+}
+
+.register-card .login-logo {
+  margin-bottom: 3px;
+}
+
+.register-card .register-logo-icon {
+  font-size: 20px;
+}
+
+.register-card h2 {
+  font-size: 21px;
+  margin: 2px 0;
+}
+
+.register-card .login-sub {
+  font-size: 12px;
+  margin: 3px 0 8px;
+}
+
+.register-card label {
+  font-size: 12px;
+  margin: 7px 0 3px;
+}
+
+.register-card .input-box {
+  margin-bottom: 2px;
+}
+
+.register-card .input-box input,
+.register-card .input-box select {
+  height: 37px;
+  padding: 7px 12px;
+  font-size: 13px;
+}
+
+.register-card .password-hint {
+  font-size: 10px;
+  line-height: 1.25;
+  margin: 2px 0 4px;
+}
+
+.register-card .login-btn {
+  height: 39px;
+  margin-top: 8px;
+}
+
+.register-card .register-link {
+  margin-top: 8px;
+  font-size: 11px;
+}

@@ -18,7 +18,7 @@ function Icon({ size = 20, children }) {
   );
 }
 
-function Login({ onLogin }) {
+function Login({ onLogin, onNavigate }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -91,7 +91,9 @@ function Login({ onLogin }) {
 
           {error && <p className="login-error">{error}</p>}
 
-          <label>Username or Email</label>
+          <label>
+            Username or Email <span className="required">*</span>
+          </label>
           <div className="input-box">
             <span className="input-icon">
               <Icon size={18}>
@@ -111,7 +113,9 @@ function Login({ onLogin }) {
             />
           </div>
 
-          <label>Password</label>
+          <label>
+            Password <span className="required">*</span>
+          </label>
           <div className="input-box">
             <span className="input-icon">
               <Icon size={18}>
@@ -152,6 +156,13 @@ function Login({ onLogin }) {
           <button type="submit" className="login-btn">
             Login
           </button>
+
+          <p className="register-link">
+            New user?{" "}
+            <button type="button" onClick={() => onNavigate("register")}>
+              Register here
+            </button>
+          </p>
         </form>
       </div>
     </div>
