@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Pencil, Trash2 } from "lucide-react";
 
 import "./KnowledgeBase.css";
 import { filterArticles, mergeById } from "./knowledgeBaseUtils";
@@ -99,6 +100,8 @@ function saveCategory(id, name, description, signal) {
 }
 
 function KnowledgeCategories({ onSaved, onLoaded }) {
+  const [showCategoryForm, setShowCategoryForm] = useState(false);
+  const categoryFormButton = useRef(null);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -127,6 +130,7 @@ function KnowledgeCategories({ onSaved, onLoaded }) {
   };
 
   const editCategory = (category) => {
+    setShowCategoryForm(true);
     setEditingId(category.id);
     setName(category.name);
     setDescription(category.description || "");
@@ -192,6 +196,7 @@ function KnowledgeCategories({ onSaved, onLoaded }) {
       if (controller.signal.aborted) return;
       setMessage(editingId === null ? "Category added." : "Category updated.");
       resetForm();
+      setShowCategoryForm(false);
       loadCategories();
       onSaved?.();
     } catch (failure) {
@@ -244,16 +249,33 @@ function KnowledgeCategories({ onSaved, onLoaded }) {
           <span className="article-writer__eyebrow">BROWSE BY TOPIC</span>
           <h3 id="categories-title">Categories</h3>
         </div>
-        <button
-          type="button"
-          disabled={loading}
-          onClick={() => loadCategories()}
-          aria-label="Refresh categories"
-        >
-          Refresh
-        </button>
+        <div className="category-form__actions">
+          <button
+            ref={categoryFormButton}
+            type="button"
+            aria-expanded={showCategoryForm}
+            aria-controls="category-editor"
+            disabled={saving}
+            onClick={() => {
+              setShowCategoryForm((shown) => !shown);
+              setMessage("");
+            }}
+          >
+            {showCategoryForm ? "Close form" : editingId === null ? "Add category" : "Continue editing"}
+          </button>
+          <button
+            type="button"
+            disabled={loading}
+            onClick={() => loadCategories()}
+            aria-label="Refresh categories"
+          >
+            Refresh
+          </button>
+        </div>
       </div>
+      {showCategoryForm && (
       <form
+        id="category-editor"
         className="category-form"
         onSubmit={submitCategory}
         aria-labelledby="category-form-title"
@@ -269,6 +291,7 @@ function KnowledgeCategories({ onSaved, onLoaded }) {
             </label>
             <input
               id="category-name"
+              autoFocus
               ref={nameRef}
               value={name}
               onChange={(event) => setName(event.target.value)}
@@ -292,11 +315,6 @@ function KnowledgeCategories({ onSaved, onLoaded }) {
             />
           </div>
         </div>
-        {saveError && (
-          <p className="article-writer__error" role="alert">
-            {saveError}
-          </p>
-        )}
         <div className="category-form__actions">
           <button type="submit" disabled={saving}>
             {saving
@@ -312,18 +330,26 @@ function KnowledgeCategories({ onSaved, onLoaded }) {
               onClick={() => {
                 resetForm();
                 setMessage("");
+                setShowCategoryForm(false);
+                categoryFormButton.current?.focus();
               }}
             >
               Cancel
             </button>
           )}
         </div>
-        {message && (
-          <p className="article-writer__status" role="status">
-            {message}
-          </p>
-        )}
       </form>
+      )}
+      {saveError && (
+        <p className="article-writer__error" role="alert">
+          {saveError}
+        </p>
+      )}
+      {message && (
+        <p className="article-writer__status" role="status">
+          {message}
+        </p>
+      )}
       {error && (
         <p className="article-writer__error" role="alert">
           {error}
@@ -378,9 +404,11 @@ function KnowledgeCategories({ onSaved, onLoaded }) {
               type="button"
               disabled={saving}
               onClick={() => editCategory(category)}
+              className="knowledge-icon-action"
+              title="Edit category"
               aria-label={`Edit category ${category.name}`}
             >
-              Edit
+              <Pencil size={18} aria-hidden="true" />
             </button>
             <div className="category-form__actions">
               {deletingId === category.id ? (
@@ -414,8 +442,11 @@ function KnowledgeCategories({ onSaved, onLoaded }) {
                   type="button"
                   disabled={saving}
                   onClick={() => setDeletingId(category.id)}
+                  className="knowledge-icon-action"
+                  title="Delete category"
+                  aria-label={`Delete category ${category.name}`}
                 >
-                  Delete category
+                  <Trash2 size={18} aria-hidden="true" />
                 </button>
               )}
             </div>
@@ -697,6 +728,9 @@ function ArticleCard({ article, categories, onSaved, onDeleted }) {
               <button
                 type="button"
                 disabled={busy}
+                className="knowledge-icon-action"
+                title="Edit article"
+                aria-label={`Edit article ${article.title}`}
                 onClick={() => {
                   setError("");
                   setMessage("");
@@ -711,7 +745,7 @@ function ArticleCard({ article, categories, onSaved, onDeleted }) {
                   });
                 }}
               >
-                Edit
+                <Pencil size={18} aria-hidden="true" />
               </button>
               <button
                 type="button"
@@ -732,8 +766,11 @@ function ArticleCard({ article, categories, onSaved, onDeleted }) {
                   setConfirmDelete(true);
                   setMessage("");
                 }}
+                className="knowledge-icon-action"
+                title="Delete article"
+                aria-label={`Delete article ${article.title}`}
               >
-                Delete
+                <Trash2 size={18} aria-hidden="true" />
               </button>
             </div>
           )}
@@ -767,7 +804,13 @@ function ArticlePreview({ title, summary, content }) {
 }
 
 function KnowledgeBase() {
+  const [showArticleForm, setShowArticleForm] = useState(false);
+  const addArticleButton = useRef(null);
   const [promptMessage, setPromptMessage] = useState("");
+
+  useEffect(() => {
+    if (promptMessage && !showArticleForm) addArticleButton.current?.focus();
+  }, [promptMessage, showArticleForm]);
 
   const [submitError, setSubmitError] = useState("");
   const [title, setTitle] = useState("");
@@ -853,6 +896,7 @@ function KnowledgeBase() {
           : "Article saved as a draft.",
       );
       setSaveStatus("draft");
+      setShowArticleForm(false);
       loadArticles();
       return true;
     } catch (error) {
@@ -884,7 +928,7 @@ function KnowledgeBase() {
   return (
     <div className="knowledge">
       <header className="kb-heading">
-        <span className="article-writer__eyebrow">SUPPORT LIBRARY</span>
+        {/* <span className="article-writer__eyebrow">SUPPORT LIBRARY</span> */}
         <h2 className="kb-title">Knowledge Base</h2>
         <p>Create helpful articles and organize your team's knowledge by topic.</p>
       </header>
@@ -894,8 +938,30 @@ function KnowledgeBase() {
         <div><dt>Drafts</dt><dd>{loading && !articles.length ? "—" : articles.filter((item) => item.status === "draft").length}</dd><span>Work in progress</span></div>
         <div><dt>Categories loaded</dt><dd>{categories.length}</dd><span>Organized by topic</span></div>
       </dl>
-      <div className="knowledge-workspace">
+      <div className="category-form__actions">
+        <button
+          ref={addArticleButton}
+          type="button"
+          aria-expanded={showArticleForm}
+          aria-controls="article-add-form"
+          disabled={saving}
+          onClick={() => {
+            setShowArticleForm((shown) => !shown);
+            setPromptMessage("");
+          }}
+        >
+          {showArticleForm ? "Close form" : "Add article"}
+        </button>
+      </div>
+      {promptMessage && (
+        <p className="article-writer__status" role="status">
+          {promptMessage}
+        </p>
+      )}
+      <div className={`knowledge-workspace${showArticleForm ? "" : " knowledge-workspace--browse"}`}>
+        {showArticleForm && (
         <form
+          id="article-add-form"
           className="article-writer"
           aria-labelledby="article-writer-title"
           aria-busy={saving}
@@ -915,6 +981,7 @@ function KnowledgeBase() {
           </label>
           <input
             id="article-title"
+            autoFocus
             className="article-writer__title"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
@@ -976,12 +1043,8 @@ function KnowledgeBase() {
               {submitError}
             </p>
           )}
-          {promptMessage && (
-            <p className="article-writer__status" role="status">
-              {promptMessage}
-            </p>
-          )}
         </form>
+        )}
         <section
           className="article-feed"
           aria-labelledby="article-feed-title"
@@ -1071,8 +1134,8 @@ function KnowledgeBase() {
             <div className="article-feed__empty">
               <h4>No articles yet</h4>
               <p>
-                Write your first article on the left. Saved articles will appear
-                here.
+                Click “Add article” to write your first article. Saved articles
+                will appear here.
               </p>
             </div>
           )}

@@ -55,24 +55,15 @@ const colors = ["#2563eb", "#e9a23b", "#159b82", "#8b93a7"];
 const charts = [
   {
     key: "query_volume",
-    title: "query over time",
-    // subtitle: "Incoming query volume",
-    subtitle: "Incoming query volume",
+    title: "Tickets over time",
+    subtitle: "Incoming ticket volume",
     type: "line",
     fields: [["tickets", "Tickets"]],
     unit: "tickets",
   },
   {
-    key: "query_status",
-    title: "query status",
-    subtitle: "Current distribution of query",
-    type: "donut",
-    fields: [["value", "Tickets"]],
-    unit: "tickets",
-  },
-  {
     key: "querys_by_category",
-    title: "querys by category",
+    title: "Tickets by category",
     subtitle: "Where customers need help",
     type: "bar",
     fields: [["tickets", "Tickets"]],
@@ -104,6 +95,14 @@ const charts = [
       ["resolution_minutes", "Resolution"],
     ],
     unit: "minutes",
+  },
+  {
+    key: "query_status",
+    title: "Ticket status",
+    subtitle: "Current distribution of tickets",
+    type: "donut",
+    fields: [["value", "Tickets"]],
+    unit: "tickets",
   },
 ];
 
@@ -305,8 +304,17 @@ function ReportChart({ chart, data, loading, sample }) {
     axisLine: false,
     tickLine: false,
   };
+  const hideXAxis = ["query_volume", "csat_trend"].includes(chart.key);
   return (
-    <section className="report-chart" aria-labelledby={`${chart.key}-title`}>
+    // <section className="report-chart" aria-labelledby={`${chart.key}-title`}> //
+ <section
+  className={`report-chart ${
+    ["query_volume", "csat_trend"].includes(chart.key)
+      ? "report-chart--full"
+      : ""
+  }`}
+  aria-labelledby={`${chart.key}-title`}
+>
       <div className="report-chart__header">
         <div>
           <h3 id={`${chart.key}-title`}>{chart.title}</h3>
@@ -356,12 +364,34 @@ function ReportChart({ chart, data, loading, sample }) {
             ) : chart.type === "line" ? (
               <LineChart
                 data={data}
-                margin={{ top: 10, right: 16, left: 0, bottom: 4 }}
-                accessibilityLayer
+margin={{
+  top: 10,
+  right: 16,
+  left: 0,
+  bottom: ["query_volume", "csat_trend"].includes(chart.key) ? 0 : 4,
+}}                accessibilityLayer
               >
-                <CartesianGrid vertical={false} stroke="#edf0f5" />
-                <XAxis dataKey="label" {...axis} minTickGap={25} />
-                <YAxis
+                <CartesianGrid
+  vertical={false}
+  horizontal={true}
+  horizontalValues={
+    ["query_volume", "csat_trend"].includes(chart.key)
+      ? [0]
+      : undefined
+  }
+  stroke="#edf0f5"
+/>
+                {/* <XAxis dataKey="label"{...axis}minTickGap={25}hide={["query_volume", "csat_trend"].includes(chart.key)}/>  */}
+                <XAxis
+  dataKey="label"
+  {...axis}
+  hide={false}
+  axisLine={false}
+  tickLine={false}
+  minTickGap={25}
+/>
+                               <YAxis
+
                   {...axis}
                   domain={chart.unit === "%" ? [0, 100] : [0, "auto"]}
                   allowDecimals={chart.unit === "%"}
@@ -638,14 +668,14 @@ function ReportsContent({ sample, onSourceChange }) {
   const kpis = report?.kpis || {};
   const cards = [
     {
-      title: "Total querys",
+      title: "Total tickets",
       value: number(kpis.total_tickets),
       detail: change(kpis.ticket_change_percent),
       icon: Ticket,
       color: "blue",
     },
     {
-      title: "Resolved querys",
+      title: "Resolved tickets",
       value: number(kpis.resolved_tickets),
       detail: `${percent(kpis.resolved_percent)} resolved`,
       icon: CheckCircle2,
@@ -678,7 +708,7 @@ function ReportsContent({ sample, onSourceChange }) {
     <div className="reports-page">
       <header className="reports-heading">
         <div>
-          <span className="reports-eyebrow">SUPPORT INTELLIGENCE</span>
+          {/* <span className="reports-eyebrow">SUPPORT INTELLIGENCE</span> */}
           <h2>Reports & Analysis</h2>
           <p>
             A clear view of your team's volume, efficiency, and customer
