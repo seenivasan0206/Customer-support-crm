@@ -18,12 +18,16 @@ function SupportRequests() {
 
   async function fetchTickets() {
     setLoading(true);
+
     try {
       let url = "http://localhost:8000/api/tickets/";
       const params = new URLSearchParams();
 
       if (search) params.append("search", search);
-      if (statusFilter !== "All") params.append("status", statusFilter.toUpperCase());
+
+      if (statusFilter !== "All") {
+        params.append("status", statusFilter.toUpperCase());
+      }
 
       if (params.toString()) {
         url += `?${params.toString()}`;
@@ -33,11 +37,12 @@ function SupportRequests() {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
       const data = await response.json();
+
       if (response.ok) {
         setTickets(data.results || []);
       } else {
@@ -63,7 +68,7 @@ function SupportRequests() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           title: subject,
@@ -79,9 +84,12 @@ function SupportRequests() {
         setDescription("");
         setPriority("Medium");
         setShowForm(false);
+        setErrorMessage("");
         fetchTickets();
       } else {
-        setErrorMessage(data.title?.[0] || data.detail || "Failed to create ticket.");
+        setErrorMessage(
+          data.title?.[0] || data.detail || "Failed to create ticket.",
+        );
       }
     } catch (err) {
       setErrorMessage("Network error while creating ticket.");
@@ -94,7 +102,7 @@ function SupportRequests() {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           status: newStatus.toUpperCase(),
@@ -121,7 +129,7 @@ function SupportRequests() {
       const response = await fetch(`http://localhost:8000/api/tickets/${id}/`, {
         method: "DELETE",
         headers: {
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -129,76 +137,120 @@ function SupportRequests() {
         fetchTickets();
       } else {
         const errorData = await response.json();
-        alert(errorData.detail || "You do not have permission to delete this ticket.");
+        alert(
+          errorData.detail ||
+            "You do not have permission to delete this ticket.",
+        );
       }
     } catch (err) {
       alert("Network error while deleting ticket.");
     }
   }
 
+  function closeForm() {
+    setShowForm(false);
+    setErrorMessage("");
+  }
+
   return (
     <div className="sr-page">
+      
       <div className="sr-header">
         <div>
           <h2>Support Requests</h2>
           <p>Manage all customer support tickets</p>
         </div>
-        <button className="sr-add-btn" onClick={() => setShowForm(!showForm)}>
-          {showForm ? "Close" : "+ New Request"}
+
+        <button
+          className="sr-add-btn"
+          type="button"
+          onClick={() => {
+            setErrorMessage("");
+            setShowForm(true);
+          }}
+        >
+          + New Request
         </button>
       </div>
 
-      {/* Error Banner */}
-      {errorMessage && (
-        <div style={{ color: "#ef4444", marginBottom: "16px" }}>
-          {errorMessage}
+      
+      {showForm && (
+        <div className="sr-modal-overlay" onClick={closeForm}>
+          <div className="sr-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="sr-modal-header">
+              <div>
+                <h3>Create New Support Request</h3>
+                <p>Enter the ticket details below</p>
+              </div>
+
+              <button
+                type="button"
+                className="sr-modal-close"
+                onClick={closeForm}
+                aria-label="Close form"
+              >
+                &times;
+              </button>
+            </div>
+
+            <form className="sr-form" onSubmit={handleAdd}>
+              <div className="sr-form-field">
+                <label>Subject *</label>
+                <input
+                  type="text"
+                  placeholder="Brief summary of the issue"
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="sr-form-field">
+                <label>Description</label>
+                <textarea
+                  placeholder="Enter detailed description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows="4"
+                />
+              </div>
+
+              <div className="sr-form-field">
+                <label>Priority</label>
+                <select
+                  value={priority}
+                  onChange={(e) => setPriority(e.target.value)}
+                >
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="High">High</option>
+                  <option value="Urgent">Urgent</option>
+                </select>
+              </div>
+
+              {errorMessage && (
+                <div className="sr-form-error">{errorMessage}</div>
+              )}
+
+              <div className="sr-modal-actions">
+                <button
+                  type="button"
+                  className="sr-cancel-btn"
+                  onClick={closeForm}
+                >
+                  Cancel
+                </button>
+
+                <button type="submit" className="sr-save-btn">
+                  Create Request
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
-      {/* New Ticket Form Modal */}
-      {showForm && (
-        <form className="sr-form" onSubmit={handleAdd}>
-          <div>
-            <label>Subject</label>
-            <input
-              type="text"
-              placeholder="Brief summary of the issue"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              required
-            />
-          </div>
-
-          <div>
-            <label>Description</label>
-            <input
-              type="text"
-              placeholder="Detailed description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label>Priority</label>
-            <select
-              value={priority}
-              onChange={(e) => setPriority(e.target.value)}
-            >
-              <option value="Low">Low</option>
-              <option value="Medium">Medium</option>
-              <option value="High">High</option>
-              <option value="Urgent">Urgent</option>
-            </select>
-          </div>
-
-          <button type="submit" className="sr-save-btn">
-            Save
-          </button>
-        </form>
-      )}
-
-      {/* Search & Filter Toolbar */}
+      
       <div className="sr-toolbar">
         <input
           type="text"
@@ -219,7 +271,7 @@ function SupportRequests() {
         </select>
       </div>
 
-      {/* Tickets Table */}
+      
       <div className="sr-table-box">
         <table>
           <thead>
@@ -232,16 +284,29 @@ function SupportRequests() {
               <th>Action</th>
             </tr>
           </thead>
+
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="6" style={{ textAlign: "center", padding: "20px" }}>
+                <td
+                  colSpan="6"
+                  style={{
+                    textAlign: "center",
+                    padding: "20px",
+                  }}
+                >
                   Loading tickets from database...
                 </td>
               </tr>
             ) : tickets.length === 0 ? (
               <tr>
-                <td colSpan="6" style={{ textAlign: "center", padding: "20px" }}>
+                <td
+                  colSpan="6"
+                  style={{
+                    textAlign: "center",
+                    padding: "20px",
+                  }}
+                >
                   No support tickets found.
                 </td>
               </tr>
@@ -249,17 +314,25 @@ function SupportRequests() {
               tickets.map((ticket) => (
                 <tr key={ticket.id}>
                   <td>{ticket.ticket_id}</td>
+
                   <td>{ticket.customer?.username || "N/A"}</td>
+
                   <td>{ticket.title}</td>
+
                   <td>
                     <select
-                      className={"sr-status " + (ticket.status?.toLowerCase() || "")}
+                      className={
+                        "sr-status " + (ticket.status?.toLowerCase() || "")
+                      }
                       value={
                         ticket.status
-                          ? ticket.status.charAt(0).toUpperCase() + ticket.status.slice(1).toLowerCase()
+                          ? ticket.status.charAt(0).toUpperCase() +
+                            ticket.status.slice(1).toLowerCase()
                           : "Open"
                       }
-                      onChange={(e) => handleStatusChange(ticket.id, e.target.value)}
+                      onChange={(e) =>
+                        handleStatusChange(ticket.id, e.target.value)
+                      }
                     >
                       <option value="Open">Open</option>
                       <option value="Pending">Pending</option>
@@ -267,7 +340,9 @@ function SupportRequests() {
                       <option value="Closed">Closed</option>
                     </select>
                   </td>
+
                   <td>{ticket.priority}</td>
+
                   <td>
                     <button
                       className="sr-delete"

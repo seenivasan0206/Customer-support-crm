@@ -190,3 +190,16 @@
 .dash-badge.pending {
   background-color: #dc2626;
 }
+
+.dash-charts-row {
+  display: flex;
+  gap: 25px;
+  margin-top: 25px;
+  flex-wrap: wrap;
+}
+
+.dash-charts-row .dash-box {
+  flex: 1;
+  min-width: 300px;
+  margin-top: 0;
+}

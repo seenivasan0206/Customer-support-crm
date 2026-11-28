@@ -58,13 +58,32 @@ function HelpAndSupport({ onNavigate }) {
     setOpenFaq(openFaq === index ? null : index);
   }
 
-  function handleQuickTicket(e) {
+  async function handleQuickTicket(e) {
     e.preventDefault();
     if (!contactSubject.trim() || !contactMessage.trim()) return;
-    setTicketSuccess(true);
-    setContactSubject("");
-    setContactMessage("");
-    setTimeout(() => setTicketSuccess(false), 5000);
+    const token = localStorage.getItem("access_token");
+    try {
+      const res = await fetch("http://localhost:8000/api/tickets/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { "Authorization": `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          title: contactSubject.trim(),
+          description: contactMessage.trim(),
+          priority: "MEDIUM"
+        })
+      });
+      if (res.ok) {
+        setTicketSuccess(true);
+        setContactSubject("");
+        setContactMessage("");
+        setTimeout(() => setTicketSuccess(false), 5000);
+      }
+    } catch (err) {
+      console.error("Error creating quick ticket:", err);
+    }
   }
 
   return (

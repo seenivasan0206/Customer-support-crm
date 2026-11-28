@@ -24,45 +24,43 @@ function Login({ onLogin }) {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-    async function handleLogin(e) {
+  async function handleLogin(e) {
     e.preventDefault();
     setError("");
 
     try {
-      
-      const response = await fetch("http://localhost:8000/api/accounts/login/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        "http://localhost:8000/api/accounts/login/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: email,
+            password: password,
+          }),
         },
-        body: JSON.stringify({
-          username: email,
-          password: password,
-        }),
-      });
+      );
 
       const data = await response.json();
 
-      
       if (response.ok) {
-        
         localStorage.setItem("access_token", data.access);
         localStorage.setItem("refresh_token", data.refresh);
         localStorage.setItem("user_role", data.user.role);
         localStorage.setItem("username", data.user.username);
 
-        
         onLogin();
       } else {
-        
         setError(data.detail || "Invalid username or password.");
       }
     } catch (err) {
-      
-      setError("Unable to connect to server. Please ensure backend server is running.");
+      setError(
+        "Unable to connect to server. Please ensure backend server is running.",
+      );
     }
   }
- 
 
   return (
     <div className="login">
@@ -81,7 +79,6 @@ function Login({ onLogin }) {
 
       <div className="login-right">
         <form className="login-card" onSubmit={handleLogin}>
-          {/* Headphone logo */}
           <div className="login-logo">
             <Icon size={28}>
               <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
@@ -92,10 +89,8 @@ function Login({ onLogin }) {
           <h2>Welcome Back</h2>
           <p className="login-sub">Login to access your support dashboard</p>
 
-          
           {error && <p className="login-error">{error}</p>}
 
-          
           <label>Username or Email</label>
           <div className="input-box">
             <span className="input-icon">
@@ -116,7 +111,6 @@ function Login({ onLogin }) {
             />
           </div>
 
-          
           <label>Password</label>
           <div className="input-box">
             <span className="input-icon">
@@ -154,8 +148,6 @@ function Login({ onLogin }) {
               )}
             </button>
           </div>
-
-          
 
           <button type="submit" className="login-btn">
             Login

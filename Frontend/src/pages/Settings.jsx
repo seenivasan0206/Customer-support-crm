@@ -80,13 +80,16 @@ export default function Settings({ registerPageGuard }) {
     const controller = new AbortController();
 
     async function fetchSettings() {
+      const token = localStorage.getItem("access_token");
       try {
         setLoading(true);
 
         const response = await fetch(
           `${API_URL}/profile`,
           {
-            credentials: "include",
+            headers: {
+              ...(token ? { "Authorization": `Bearer ${token}` } : {})
+            },
             signal: controller.signal,
           }
         );
@@ -130,14 +133,19 @@ export default function Settings({ registerPageGuard }) {
   // Fetch role and integration information
   useEffect(() => {
     async function fetchAdditionalSettings() {
+      const token = localStorage.getItem("access_token");
       try {
         const [rolesResponse, integrationsResponse] =
           await Promise.all([
             fetch(`${API_URL}/roles`, {
-              credentials: "include",
+              headers: {
+                ...(token ? { "Authorization": `Bearer ${token}` } : {})
+              },
             }),
             fetch(`${API_URL}/integrations`, {
-              credentials: "include",
+              headers: {
+                ...(token ? { "Authorization": `Bearer ${token}` } : {})
+              },
             }),
           ]);
 
@@ -196,12 +204,13 @@ export default function Settings({ registerPageGuard }) {
     try {
       setSaving(true);
       setMessage("");
+      const token = localStorage.getItem("access_token");
 
       const response = await fetch(`${API_URL}/profile`, {
         method: "PUT",
-        credentials: "include",
         headers: {
           "Content-Type": "application/json",
+          ...(token ? { "Authorization": `Bearer ${token}` } : {})
         },
         body: JSON.stringify(draft),
       });

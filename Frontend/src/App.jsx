@@ -24,30 +24,27 @@ function isSavedLogin() {
 }
 
 function getInitialPage() {
-  const loggedIn = isSavedLogin();
-
-  if (!loggedIn) {
+  if (!isSavedLogin()) {
     window.history.replaceState(null, "", "#/login");
     return "login";
   }
 
   const navigation = performance.getEntriesByType("navigation")[0];
+  const isRefresh = navigation?.type === "reload";
 
-  if (navigation?.type === "reload") {
+  if (isRefresh) {
     window.history.replaceState(null, "", "#/dashboard");
     return "dashboard";
   }
 
-  const currentPage = decodeURIComponent(
-    window.location.hash.replace("#/", ""),
-  );
+  const page = decodeURIComponent(window.location.hash.replace("#/", ""));
 
-  if (!currentPage || currentPage === "login") {
+  if (!page || page === "login") {
     window.history.replaceState(null, "", "#/dashboard");
     return "dashboard";
   }
 
-  return currentPage;
+  return page;
 }
 
 function App() {

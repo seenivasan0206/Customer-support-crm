@@ -121,6 +121,12 @@ function buildQuery(filters) {
 }
 
 async function reportRequest(path, options = {}) {
+  const token = localStorage.getItem("access_token");
+  const headers = {
+    ...(options.headers || {}),
+    ...(token ? { "Authorization": `Bearer ${token}` } : {})
+  };
+  options = { ...options, headers };
   let response;
   try {
     response = await fetch(`${reportsUrl}/${path}`, options);
@@ -461,7 +467,7 @@ function ReportChart({ chart, data, loading, sample }) {
 }
 
 export default function Reports() {
-  const [sample, setSample] = useState(true);
+  const [sample, setSample] = useState(false);
   return <ReportsContent key={String(sample)} sample={sample} onSourceChange={() => setSample(value => !value)} />;
 }
 
